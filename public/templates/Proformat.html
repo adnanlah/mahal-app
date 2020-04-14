@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Proformat</title>
+	<style>
+		body {
+			padding: 10px 20px;
+		}
+		header {
+			text-align: center;
+		}
+		main {
+			margin-bottom: 25px;
+			text-align: center;
+		}
+		table {
+			border-spacing: 0;
+			border-collapse: collapse;
+			margin-bottom: 15px;
+		}
+		table.lines-table {
+			width: 100%;
+			margin-bottom: 15px;
+		}
+		table.lines-table th, table.lines-table td {
+			border: 1px solid #000;
+			text-align: center;
+			padding: 5px;
+		}
+		table.total * {
+			padding: 5px 15px;
+			border: 1px solid #000;
+		}
+		th, .highlighted-td {
+			background-color: #eee;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<h3>{{company.name}}</h3>
+		<h3>{{company.address}}</h3>
+		<h4>{{company.city}} le:{{date}}</h4>
+	</header>
+	<main>
+		<h3>FACTURE PROFORMAT N:{{invoice.ID}}</h3>	
+		<h4>DOIT: {{invoice.client}}</h4>
+		<table class="lines-table">
+			<tr>
+				<th>N</th>
+				<th>Désignation</th>
+				<th>Unité</th>
+				<th>Quantité</th>
+				<th>Prix U (TTC)</th>
+				<th>Total</th>
+			</tr>
+			<tr>
+				<td>01</td>
+				<td>Installation Kit GPL pour cherry</td>
+				<td>Un</td>
+				<td>01</td>
+				<td>60 000,00</td>
+				<td>60 000,00</td>
+			</tr>
+		</table>
+		<table class="total">
+			<tr>
+				<td>Total-TTC</td>
+				<td class="highlighted-td">60 000,00</td>
+			</tr>
+		</table>
+		<div>
+			La présente Facture est arrêtér à la sommes de en TTC: 
+		</div>
+	</main>
+	<footer>
+		<div>Le fournisseur: {{invoice.dataValues.Client.name}}</div>
+	</footer>
+</body>
+</html>

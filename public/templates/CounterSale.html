@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		body {
+			font-size: 14px;
+		}
+		header {
+			margin: 15px auto;
+			text-align: center;
+		}
+		h3, h4 {
+			margin: 0;
+		}
+		footer {
+			text-align: center;
+			margin: 15px 0;
+		}
+		table.lines-table {
+			width: 100%;
+			margin-bottom: 10px;
+		}
+		table th, table td {
+			text-align: center;
+			padding: 5px;
+		}
+		table.total {
+			margin: 0 auto;
+		}
+		
+		.invoice-info {
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 10px;
+		}
+		.invoice {
+			width: 50%;
+			padding: 15px 5px;
+			box-sizing: border-box;
+		}
+		.container {
+			border: 1px dashed darkgrey;
+			padding: 15px 5px;
+		}
+		.title {
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+	<div class="invoice">
+		<div class="container">
+			<header>
+				<div class="logo">
+					<img src="img/logo.png" alt="">
+				</div>
+				<h3>ETS DJOUDI BOUAZA</h3>
+				<h4>Lorem ipsum dolor sit amet.</h4>
+			</header>
+			<main>
+				<div class="invoice-info">
+					<div class="title">Bon de vente N: 123</div>
+					<div>Djelfa le: 03-01-2020 19:23</div>
+				</div>
+				<table class="lines-table">
+					<tr>
+						<th>N</th>
+						<th>Produit</th>
+						<th>Prix U</th>
+						<th>Quantité</th>
+						<th>Total</th>
+					</tr>
+					<tr>
+						<td>1</td>
+						<td>Kit</td>
+						<td>40</td>
+						<td>3</td>
+						<td>120</td>
+					</tr>
+					<tr>
+						<td>1</td>
+						<td>Kit</td>
+						<td>40</td>
+						<td>3</td>
+						<td>120</td>
+					</tr>
+					<tr>
+						<td>1</td>
+						<td>Kit</td>
+						<td>40</td>
+						<td>3</td>
+						<td>120</td>
+					</tr>
+					<tr>
+						<td>1</td>
+						<td>Kit</td>
+						<td>40</td>
+						<td>3</td>
+						<td>120</td>
+					</tr>
+					<tr>
+						<td>1</td>
+						<td>Kit</td>
+						<td>40</td>
+						<td>3</td>
+						<td>120</td>
+					</tr>
+					<tr>
+						<td>1</td>
+						<td>Kit</td>
+						<td>40</td>
+						<td>3</td>
+						<td>120</td>
+					</tr>
+				</table>
+				<table class="total">
+					<tr>
+						<th>Total</th>
+						<th>120</th>
+					</tr>
+				</table>
+			</main>
+			<footer>
+				<div>{{company.phone}}</div>
+				<div>{{company.mobile}}</div>
+				<div>{{company.email}}</div>
+			</footer>
+		</div>
+	</div>
+</body>
+</html>

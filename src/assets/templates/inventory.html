@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Inventoire</title>
+	<style>
+		body {
+			text-align: center;
+			padding: 20px;
+		}
+		header {
+			display: flex;
+			justify-content: space-between;
+			text-align: right;
+		}
+		table {
+			width: 100%;
+			margin: 0 auto;
+			border-spacing: 0;
+			border-collapse: collapse;
+		}
+		table th, table td {
+			border: 1px solid darkgray;
+			padding: 5px;
+		}
+		td.category {
+			colspan: 6;
+			text-align: center;
+			font-weight: 800;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<div class="logo">
+			<img src="img/logo.png" alt="">
+		</div>
+		<div class="company-info">
+			<div>
+				<div>ETS DJOUDI BOUAZA</div>
+				<div>Lorem ipsum dolor sit amet.</div>
+				<div>021 50 56 95 / 0775 55 55 55</div>
+			</div>		
+		</div>
+	</header>
+	<main>
+		<h2 class="title">L'INVENTOIRE</h2>
+		<h4 class="info">Imprimé le 03-11-2020 01:14</h4>
+		<div class="inventory">
+			<table>
+				<tr>
+					<th>ID</th>
+					<th>Nom</th>
+					<th>Description</th>
+					<th>Marque</th>
+					<th>Avg. Prix d'achat</th>
+					<th>Prix de vente</th>
+					<th>Quantité</th>
+				</tr>
+				<tr>
+					<td>1</td>
+					<td class="category" colspan="6">Catone</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>Lorem ipsum.</td>
+					<td>Lorem ipsum.</td>
+					<td>Lorem ipsum.</td>
+					<td>Lorem ipsum.</td>
+					<td>Lorem ipsum.</td>
+					<td>Lorem ipsum.</td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td class="category" colspan="6">Lorem ipsum dolor sit.</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>Lorem ipsum.</td>
+					<td>Lorem ipsum.</td>
+					<td>Lorem ipsum.</td>
+					<td>Lorem ipsum.</td>
+					<td>Lorem ipsum.</td>
+					<td>Lorem ipsum.</td>
+				</tr>
+			</table>
+		</div>
+	</main>
+	<footer>
+		
+	</footer>
+</body>
+</html>

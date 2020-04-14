@@ -1,0 +1,17 @@
+{
+  "development": {
+    "database": "database_development",
+    "storage": "./mahal-database-dev.sqlite3",
+    "dialect": "sqlite"
+  },
+  "test": {
+    "database": "database_test",
+    "storage": ":memory",
+    "dialect": "sqlite"
+  },
+  "production": {
+    "database": "database_production",
+    "storage": "./mahal-database.sqlite3",
+    "dialect": "sqlite"
+  }
+}
