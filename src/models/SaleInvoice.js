@@ -49,11 +49,6 @@ module.exports = (sequelize, DataTypes) => {
           debt_seen: false
         }
       },
-      draft: {
-        where: {
-          draft: true
-        }
-      },
     }
   });
   SaleInvoice.associate = function(models) {

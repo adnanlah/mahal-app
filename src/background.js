@@ -9,9 +9,11 @@ import fs from 'fs'
 import fse from 'fs-extra'
 // import image2base64 from 'image-to-base64'
 import DocumentGenerator from './classes/DocumentGenerator.js'
+import migrationsList from './classes/MigrationsList.js'
 
 const dbs = require('./models').default;
-const Op = dbs.Sequelize.Op;
+let {sequelize, Sequelize} = dbs;
+const Op = Sequelize.Op;
 
 const dataDir = path.join(app.getPath('exe'), `../data`);
 const documentsDir = app.getPath('documents');
@@ -24,12 +26,7 @@ if (!fs.existsSync(dataDir)){
 let dg;
 
 const umzug = new Umzug({
-  migrations: {
-    path: path.join(__dirname, './migrations'),
-    params: [
-      dbs.sequelize.getQueryInterface()
-    ]
-  },
+  migrations: Umzug.migrationsList(migrationsList, [dbs.sequelize.getQueryInterface(), Sequelize]),
   storage: 'sequelize',
   storageOptions: {
     sequelize: dbs.sequelize
