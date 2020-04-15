@@ -1,7 +1,7 @@
 module.exports = [
 // create tables
 {
-  name: '20200413022215-create-table-accounts',
+  name: '20200413022200-create-table-accounts',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Accounts', {
       id: {
@@ -39,7 +39,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022216-create-table-companies',
+  name: '20200413022201-create-table-companies',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Companies', {
       id: {
@@ -78,7 +78,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022217-create-table-recettes',
+  name: '20200413022202-create-table-recettes',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Recettes', {
       id: {
@@ -108,7 +108,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022218-create-table-depenses',
+  name: '20200413022203-create-table-depenses',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Depenses', {
       id: {
@@ -138,7 +138,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022219-create-table-logs',
+  name: '20200413022204-create-table-logs',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Logs', {
       id: {
@@ -166,7 +166,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022220-create-table-payments',
+  name: '20200413022205-create-table-payments',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Payments', {
       id: {
@@ -199,7 +199,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022221-create-table-products',
+  name: '20200413022206-create-table-products',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Products', {
       id: {
@@ -258,7 +258,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022222-create-table-productcategories',
+  name: '20200413022207-create-table-productcategories',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('ProductCategories', {
       id: {
@@ -285,7 +285,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022223-create-table-countersales',
+  name: '20200413022208-create-table-countersales',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('CounterSales', {
       id: {
@@ -329,7 +329,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022225-create-table-proformats',
+  name: '20200413022209-create-table-proformats',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Proformats', {
       id: {
@@ -376,7 +376,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022227-create-table-purchase-invoices',
+  name: '20200413022210-create-table-purchase-invoices',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('PurchaseInvoices', {
       id: {
@@ -421,7 +421,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022229-create-table-purchaseorders',
+  name: '20200413022211-create-table-purchaseorders',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('PurchaseOrders', {
       id: {
@@ -450,7 +450,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022231-create-table-saleinvoices',
+  name: '20200413022212-create-table-saleinvoices',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('SaleInvoices', {
       id: {
@@ -504,7 +504,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022233-create-table-saleorders',
+  name: '20200413022213-create-table-saleorders',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('SaleOrders', {
       id: {
@@ -533,7 +533,7 @@ module.exports = [
 
 // add associations
 {
-  name: '20200413022235-add-associations',
+  name: '20200413022214-add-associations',
   up: (queryInterface, Sequelize) => {
     return queryInterface.addColumn(
       'Payments', // name of Source model
@@ -691,7 +691,7 @@ module.exports = [
 
 // add belongs-to-many associations
 {
-  name: '20200413022224-create-table-countersale-products',
+  name: '20200413022215-create-table-countersale-products',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('CounterSale_Products', {
       CounterSaleId: Sequelize.INTEGER,
@@ -716,7 +716,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022226-create-table-proformat-products',
+  name: '20200413022216-create-table-proformat-products',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Proformat_Products', {
       ProformatId: Sequelize.INTEGER,
@@ -744,7 +744,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022228-create-table-purchaseinvoice-products',
+  name: '20200413022217-create-table-purchaseinvoice-products',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('PurchaseInvoice_Products', {
       PurchaseInvoiceId: Sequelize.INTEGER,
@@ -768,7 +768,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022230-create-table-purchaseorder-products',
+  name: '20200413022218-create-table-purchaseorder-products',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('PurchaseOrder_Products', {
       PurchaseOrderId: Sequelize.INTEGER,
@@ -797,7 +797,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022232-create-table-saleinvoice-products',
+  name: '20200413022219-create-table-saleinvoice-products',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('SaleInvoice_Products', {
       SaleInvoiceId: Sequelize.INTEGER,
@@ -826,7 +826,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022234-create-table-saleorder-products',
+  name: '20200413022220-create-table-saleorder-products',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('SaleOrder_Products', {
       SaleOrderId: Sequelize.INTEGER,

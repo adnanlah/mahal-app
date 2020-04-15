@@ -42,7 +42,7 @@
                 detailed
                 hoverable
                 custom-detail-row
-                :opened-detailed="['catone']"
+                checkable
                 :default-sort="['name', 'asc']"
                 detail-key="name">
 
@@ -98,7 +98,7 @@
                 </template>
 
                 <template slot="detail" slot-scope="props">
-                    <tr v-for="item in props.row.dataValues.Products" :key="item.ID" @click="clickProduct(item)">
+                    <tr v-for="item in props.row.dataValues.Products" :key="item.dataValues.ID" @click="clickProduct(item)">
                         <td v-if="showDetailIcon"></td>
                         <td>&nbsp;&nbsp;&nbsp;&nbsp;{{ item.dataValues.name }}</td>
                         <td class="has-text-centered">{{ item.dataValues.ID }}</td>
