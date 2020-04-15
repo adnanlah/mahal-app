@@ -6,7 +6,9 @@ module.exports = (sequelize, DataTypes) => {
     motive: DataTypes.STRING,
     client_name: DataTypes.STRING,
     client_info: DataTypes.STRING,
-    date: DataTypes.STRING
+    date: DataTypes.STRING,
+    updatedAt: DataTypes.STRING,
+    createdAt: DataTypes.STRING
   }, {});
   Recette.associate = function(models) {
     // associations can be defined here

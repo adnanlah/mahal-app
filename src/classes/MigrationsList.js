@@ -26,11 +26,11 @@ module.exports = [
       type: Sequelize.STRING,
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.STRING,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -65,11 +65,11 @@ module.exports = [
       logo: Sequelize.STRING,
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -95,11 +95,11 @@ module.exports = [
       date: Sequelize.STRING,
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -122,14 +122,14 @@ module.exports = [
       designation: Sequelize.STRING,
       account: Sequelize.STRING,
       account_info: Sequelize.STRING,
-      date: Sequelize.DATE,
+      date: Sequelize.STRING,
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -153,11 +153,11 @@ module.exports = [
       type: Sequelize.BOOLEAN,
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -186,11 +186,11 @@ module.exports = [
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -245,11 +245,11 @@ module.exports = [
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -272,11 +272,11 @@ module.exports = [
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -316,11 +316,11 @@ module.exports = [
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -363,11 +363,11 @@ module.exports = [
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -408,11 +408,11 @@ module.exports = [
       ntp_text: Sequelize.STRING,
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -437,11 +437,11 @@ module.exports = [
       ttc: Sequelize.FLOAT,
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -482,8 +482,8 @@ module.exports = [
       ntp_text: Sequelize.STRING,
       amount_paid: Sequelize.FLOAT,
       fully_paid: Sequelize.BOOLEAN,
-      debt_last_date: Sequelize.DATE,
-      debt_alarm_date: Sequelize.DATE,
+      debt_last_date: Sequelize.STRING,
+      debt_alarm_date: Sequelize.STRING,
       debt_note: Sequelize.STRING,
       debt_seen: {
         type: Sequelize.BOOLEAN,
@@ -491,11 +491,11 @@ module.exports = [
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -518,11 +518,11 @@ module.exports = [
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -703,11 +703,11 @@ module.exports = [
       cost: Sequelize.FLOAT,
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -731,11 +731,11 @@ module.exports = [
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -755,11 +755,11 @@ module.exports = [
       amount: Sequelize.FLOAT,
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -784,11 +784,11 @@ module.exports = [
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -813,11 +813,11 @@ module.exports = [
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
@@ -837,11 +837,11 @@ module.exports = [
       amount: Sequelize.FLOAT,
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },

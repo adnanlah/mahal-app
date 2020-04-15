@@ -4,6 +4,8 @@ module.exports = (sequelize, DataTypes) => {
     number: DataTypes.INTEGER,
     amount: DataTypes.FLOAT,
     date: DataTypes.STRING,
+    updatedAt: DataTypes.STRING,
+    createdAt: DataTypes.STRING
   }, {});
   Payment.associate = function(models) {
     Payment.belongsTo(models.SaleInvoice);

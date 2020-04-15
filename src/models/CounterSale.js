@@ -13,6 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.FLOAT,
       defaultValue: 0
     },
+    updatedAt: DataTypes.STRING,
+    createdAt: DataTypes.STRING
   }, {});
   CounterSale.associate = function(models) {
     // associations can be defined here

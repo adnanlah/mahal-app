@@ -6,6 +6,8 @@ module.exports = (sequelize, DataTypes) => {
     tva_percentage: DataTypes.FLOAT,
     tva: DataTypes.FLOAT,
     ttc: DataTypes.FLOAT,
+    updatedAt: DataTypes.STRING,
+    createdAt: DataTypes.STRING
   }, {});
   PurchaseOrder.associate = function(models) {
     PurchaseOrder.belongsToMany(models.Product, {through: 'PurchaseOrder_Product', as: 'Items'})

@@ -30,7 +30,9 @@ module.exports = (sequelize, DataTypes) => {
     debt_seen: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
-    }
+    },
+    updatedAt: DataTypes.STRING,
+    createdAt: DataTypes.STRING
   }, {
     scopes: {
       paid: {

@@ -21,7 +21,9 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 0
     },
     ntp: DataTypes.FLOAT,
-    ntp_text: DataTypes.STRING
+    ntp_text: DataTypes.STRING,
+    updatedAt: DataTypes.STRING,
+    createdAt: DataTypes.STRING
   }, {});
   PurchaseInvoice.associate = function(models) {
     PurchaseInvoice.belongsToMany(models.Product, {through: 'PurchaseInvoice_Product', as: 'Items'})

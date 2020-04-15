@@ -26,7 +26,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0
-    }
+    },
+    updatedAt: DataTypes.STRING,
+    createdAt: DataTypes.STRING
   }, {});
   Product.associate = function(models) {
     Product.belongsToMany(models.PurchaseInvoice, {through: 'PurhcaseInvoice_Product'})

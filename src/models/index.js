@@ -3,6 +3,7 @@
 // const fs = require('fs');
 // const path = require('path');
 const Sequelize = require('sequelize');
+const moment = require('moment-timezone');
 // const basename = path.basename(__filename);
 // const env = process.env.NODE_ENV || 'development';
 // const config = require(__dirname + '/../config/config.json')[env];
@@ -23,9 +24,22 @@ const sequelize = new Sequelize(
   'InvoicesApp',
   {
     dialect: 'sqlite',
-    storage: './src/mahal-database-dev.sqlite3'
+    storage: './src/mahal-database-dev.sqlite3',
+    define: {
+      timestamps: false,
+    },
+    hooks: {
+      beforeCreate(model, options) {
+        model.createdAt = moment().tz("Africa/Algiers").format();
+        model.updatedAt = moment().tz("Africa/Algiers").format();
+      },
+      beforeUpdate(model, options) {
+        model.updatedAt = moment().tz("Africa/Algiers").format();
+      }
+    }
   }
 );
+
 // console.log(__dirname)
 
 const context = require.context('.', true, /^\.\/(?!index\.js).*\.js$/, 'sync')

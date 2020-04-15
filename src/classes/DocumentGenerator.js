@@ -79,8 +79,8 @@ class DocumentGenerator {
 
 			for (let i = 0; i < datasArray.length; i++) {
 				console.log('data.date', datasArray[i].date)
-				datasArray[i].formattedDate = new moment(datasArray[i].date).format('DD-MM-YYYY');
-				datasArray[i].printedAt = new moment().format('DD-MM-YYYYTHH.mm.ss')
+				datasArray[i].formattedDate = moment(datasArray[i].date).format('DD-MM-YYYY');
+				datasArray[i].printedAt = moment().format('DD-MM-YYYYTHH.mm.ss')
 				const outputName = `${documentType} document ${date} N${i}`;
 				let html = await this.html(datasArray[i], documentType);
 				let filePath = path.join(this.dirDocFiles, `/documents/${outputName}.pdf`);

@@ -9,6 +9,8 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       defaultValue: ''
     },
+    updatedAt: DataTypes.STRING,
+    createdAt: DataTypes.STRING
   }, {});
   PurchaseOrder_Product.associate = function(models) {
     // associations can be defined here

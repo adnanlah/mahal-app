@@ -6,8 +6,6 @@
             <p class="modal-card-title" v-else>Ajouter un Client/Fournisseur</p>
         </header>
         <section class="modal-card-body">
-          
-
           <div class="columns">
             <div class="column is-4">
               <b-field label="Client ou Fournisseur">
@@ -98,7 +96,6 @@ import {ipcRenderer} from 'electron';
     data() {
       return {
         accountData: {
-          ID: '',
           name: '',
           type: 'client',
         },

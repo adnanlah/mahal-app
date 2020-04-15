@@ -14,6 +14,8 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.FLOAT,
       defaultValue: 0
     },
+    updatedAt: DataTypes.STRING,
+    createdAt: DataTypes.STRING
   }, {});
   Proformat.associate = function(models) {
     // Proformat.belongsToMany(models.Product, {through: 'Proformat_Product', as: 'Items'})

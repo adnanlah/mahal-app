@@ -20,6 +20,7 @@
     "handlebars": "^4.7.3",
     "image-to-base64": "^2.0.1",
     "moment": "^2.24.0",
+    "moment-timezone": "^0.5.28",
     "pg-hstore": "^2.3.3",
     "puppeteer": "^2.1.1",
     "sequelize": "^5.21.2",

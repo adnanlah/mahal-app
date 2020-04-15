@@ -5,7 +5,9 @@ module.exports = (sequelize, DataTypes) => {
     quantity: DataTypes.INTEGER,
     unity: DataTypes.STRING,
     amount: DataTypes.FLOAT,
-    cost: DataTypes.FLOAT
+    cost: DataTypes.FLOAT,
+    updatedAt: DataTypes.STRING,
+    createdAt: DataTypes.STRING
   }, {});
   CounterSale_Product.associate = function(models) {
     CounterSale_Product.belongsTo(models.Product);

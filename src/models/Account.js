@@ -15,6 +15,8 @@ module.exports = (sequelize, DataTypes) => {
     cap: DataTypes.STRING,
     bank_account: DataTypes.STRING,
     type: DataTypes.STRING,
+    updatedAt: DataTypes.STRING,
+    createdAt: DataTypes.STRING
   }, {});
   account.associate = function(models) {
     // associations can be defined here
