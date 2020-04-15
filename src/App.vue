@@ -77,6 +77,9 @@
             <b-navbar-item tag="router-link" :to="{ path: '/reports' }">
                 RAPPORTS
             </b-navbar-item>
+            <b-navbar-item tag="router-link" :to="{ path: '/logs' }">
+                HISTORIQUE
+            </b-navbar-item>
 
         </template>
 
@@ -89,9 +92,6 @@
                   
               </a>
 
-              <b-dropdown-item aria-role="listitem">
-                HISTORIQUE
-              </b-dropdown-item>
               <b-dropdown-item aria-role="listitem" @click="isCompanyModalActive = true">
                 Entreprise
               </b-dropdown-item>
