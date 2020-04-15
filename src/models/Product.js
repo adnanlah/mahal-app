@@ -1,4 +1,5 @@
 'use strict';
+const moment = require('moment');
 module.exports = (sequelize, DataTypes) => {
   const Product = sequelize.define('Product', {
     name: DataTypes.STRING,
@@ -25,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0
-    },
+    }
   }, {});
   Product.associate = function(models) {
     Product.belongsToMany(models.PurchaseInvoice, {through: 'PurhcaseInvoice_Product'})

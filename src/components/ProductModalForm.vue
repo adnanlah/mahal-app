@@ -57,10 +57,16 @@
                   <b-input disabled v-model.number="productData.average_purchase_price" required>
                   </b-input>
               </b-field>
-              <b-field v-if="isUpdate" label="Quantité">
-                  <b-input disabled v-model.number="productData.quantity" required>
-                  </b-input>
-              </b-field>
+              <template v-if="isUpdate">
+                <b-field label="Quantité">
+                    <b-input disabled v-model.number="productData.quantity">
+                    </b-input>
+                </b-field>
+                <b-field label="Crée le">
+                    <b-input disabled v-model="productData.createdAt">
+                    </b-input>
+                </b-field>
+              </template>
 
               <b-field label="Choisi la categorie">
                 <b-field>

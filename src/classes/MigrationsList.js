@@ -1,6 +1,7 @@
 module.exports = [
+// create tables
 {
-  name: '20200413022215-create-table',
+  name: '20200413022215-create-table-accounts',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Accounts', {
       id: {
@@ -25,7 +26,7 @@ module.exports = [
       type: Sequelize.STRING,
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
@@ -38,7 +39,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022216-create-table',
+  name: '20200413022216-create-table-companies',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Companies', {
       id: {
@@ -77,7 +78,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022217-create-table',
+  name: '20200413022217-create-table-recettes',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Recettes', {
       id: {
@@ -107,7 +108,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022218-create-table',
+  name: '20200413022218-create-table-depenses',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Depenses', {
       id: {
@@ -137,7 +138,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022219-create-table',
+  name: '20200413022219-create-table-logs',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Logs', {
       id: {
@@ -165,7 +166,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022220-create-table',
+  name: '20200413022220-create-table-payments',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Payments', {
       id: {
@@ -198,7 +199,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022221-create-table',
+  name: '20200413022221-create-table-products',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Products', {
       id: {
@@ -257,7 +258,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022222-create-table',
+  name: '20200413022222-create-table-productcategories',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('ProductCategories', {
       id: {
@@ -284,7 +285,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022223-create-table',
+  name: '20200413022223-create-table-countersales',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('CounterSales', {
       id: {
@@ -328,32 +329,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022224-create-table',
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('CounterSale_Products', {
-      CounterSaleId: Sequelize.INTEGER,
-      ProductId: Sequelize.INTEGER,
-      unity_price: Sequelize.FLOAT,
-      quantity: Sequelize.INTEGER,
-      unity: Sequelize.STRING,
-      amount: Sequelize.FLOAT,
-      cost: Sequelize.FLOAT,
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
-    });
-  },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('CounterSale_Products');
-  }
-},
-{
-  name: '20200413022225-create-table',
+  name: '20200413022225-create-table-proformats',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Proformats', {
       id: {
@@ -400,35 +376,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022226-create-table',
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Proformat_Products', {
-      ProformatId: Sequelize.INTEGER,
-      ProductId: Sequelize.INTEGER,
-      unity_price: Sequelize.FLOAT,
-      quantity: Sequelize.INTEGER,
-      unity: Sequelize.STRING,
-      amount: Sequelize.FLOAT,
-      designation:  {
-        type: Sequelize.STRING,
-        defaultValue: ''
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
-    });
-  },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Proformat_Products');
-  }
-},
-{
-  name: '20200413022227-create-table',
+  name: '20200413022227-create-table-purchase-invoices',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('PurchaseInvoices', {
       id: {
@@ -473,31 +421,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022228-create-table',
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('PurchaseInvoice_Products', {
-      PurchaseInvoiceId: Sequelize.INTEGER,
-      ProductId: Sequelize.INTEGER,
-      unity_price: Sequelize.FLOAT,
-      quantity: Sequelize.INTEGER,
-      unity: Sequelize.STRING,
-      amount: Sequelize.FLOAT,
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
-    });
-  },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('PurchaseInvoice_Products');
-  }
-},
-{
-  name: '20200413022229-create-table',
+  name: '20200413022229-create-table-purchaseorders',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('PurchaseOrders', {
       id: {
@@ -526,36 +450,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022230-create-table',
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('PurchaseOrder_Products', {
-      PurchaseOrderId: Sequelize.INTEGER,
-      ProductId: Sequelize.INTEGER,
-      unity_price: Sequelize.FLOAT,
-      quantity: Sequelize.INTEGER,
-      unity: Sequelize.STRING,
-      amount: Sequelize.FLOAT,
-      cost: Sequelize.FLOAT,
-      designation:  {
-        type: Sequelize.STRING,
-        defaultValue: ''
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
-    });
-  },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('PurchaseOrder_Products');
-  }
-},
-{
-  name: '20200413022231-create-table',
+  name: '20200413022231-create-table-saleinvoices',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('SaleInvoices', {
       id: {
@@ -609,7 +504,300 @@ module.exports = [
   }
 },
 {
-  name: '20200413022232-create-table',
+  name: '20200413022233-create-table-saleorders',
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.createTable('SaleOrders', {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER
+      },
+      unity_price: {
+        type: Sequelize.FLOAT
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      }
+    });
+  },
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.dropTable('SaleOrders');
+  }
+},
+
+// add associations
+{
+  name: '20200413022235-add-associations',
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.addColumn(
+      'Payments', // name of Source model
+      'SaleInvoiceId', // name of the key we're adding 
+      {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'SaleInvoices', // name of Target model
+          key: 'id', // key in Target model that we're referencing
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      }
+    )
+    .then(() => {
+      return queryInterface.addColumn(
+        'Products',
+        'ProductCategoryId',
+        {
+          type: Sequelize.INTEGER,
+          references: {
+            model: 'ProductCategories',
+            key: 'id',
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'SET NULL',
+        }
+      )
+    })
+    .then(() => {
+      return queryInterface.addColumn(
+        'Proformats',
+        'ClientId',
+        {
+          type: Sequelize.INTEGER,
+          references: {
+            model: 'Accounts',
+            key: 'id',
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'SET NULL',
+        }
+      )
+    })
+    .then(() => {
+      return queryInterface.addColumn(
+        'PurchaseInvoices',
+        'SupplierId',
+        {
+          type: Sequelize.INTEGER,
+          references: {
+            model: 'Accounts',
+            key: 'id',
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'SET NULL',
+        }
+      )
+    })
+    .then(() => {
+      return queryInterface.addColumn(
+        'PurchaseOrders',
+        'SupplierId',
+        {
+          type: Sequelize.INTEGER,
+          references: {
+            model: 'Accounts',
+            key: 'id',
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'SET NULL',
+        }
+      )
+    })
+    .then(() => {
+      return queryInterface.addColumn(
+        'SaleInvoices',
+        'ClientId',
+        {
+          type: Sequelize.INTEGER,
+          references: {
+            model: 'Accounts',
+            key: 'id',
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'SET NULL',
+        }
+      )
+    })
+    .then(() => {
+      return queryInterface.addColumn(
+        'SaleOrders',
+        'ClientId',
+        {
+          type: Sequelize.INTEGER,
+          references: {
+            model: 'Accounts',
+            key: 'id',
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'SET NULL',
+        }
+      )
+    })
+  },
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.removeColumn(
+      'Payments', // name of Source model
+      'SaleInvoiceId', // name of the key we're adding 
+    )
+    .then(() => {
+      // remove Payment hasOne Order
+      return queryInterface.removeColumn(
+        'Products',
+        'ProductCategoryId',
+      );
+    })
+    .then(() => {
+      // remove Payment hasOne Order
+      return queryInterface.removeColumn(
+        'Proformats',
+        'ClientId',
+      );
+    })
+    .then(() => {
+      // remove Payment hasOne Order
+      return queryInterface.removeColumn(
+        'PurchaseInvoices',
+        'SupplierId',
+      );
+    })
+    .then(() => {
+      // remove Payment hasOne Order
+      return queryInterface.removeColumn(
+        'PurchaseOrders',
+        'SupplierId',
+      );
+    })
+    .then(() => {
+      // remove Payment hasOne Order
+      return queryInterface.removeColumn(
+        'SaleInvoices',
+        'ClientId',
+      );
+    })
+    .then(() => {
+      // remove Payment hasOne Order
+      return queryInterface.removeColumn(
+        'SaleOrders',
+        'ClientId',
+      );
+    })
+  }
+},
+
+// add belongs-to-many associations
+{
+  name: '20200413022224-create-table-countersale-products',
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.createTable('CounterSale_Products', {
+      CounterSaleId: Sequelize.INTEGER,
+      ProductId: Sequelize.INTEGER,
+      unity_price: Sequelize.FLOAT,
+      quantity: Sequelize.INTEGER,
+      unity: Sequelize.STRING,
+      amount: Sequelize.FLOAT,
+      cost: Sequelize.FLOAT,
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      }
+    });
+  },
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.dropTable('CounterSale_Products');
+  }
+},
+{
+  name: '20200413022226-create-table-proformat-products',
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.createTable('Proformat_Products', {
+      ProformatId: Sequelize.INTEGER,
+      ProductId: Sequelize.INTEGER,
+      unity_price: Sequelize.FLOAT,
+      quantity: Sequelize.INTEGER,
+      unity: Sequelize.STRING,
+      amount: Sequelize.FLOAT,
+      designation:  {
+        type: Sequelize.STRING,
+        defaultValue: ''
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      }
+    });
+  },
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.dropTable('Proformat_Products');
+  }
+},
+{
+  name: '20200413022228-create-table-purchaseinvoice-products',
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.createTable('PurchaseInvoice_Products', {
+      PurchaseInvoiceId: Sequelize.INTEGER,
+      ProductId: Sequelize.INTEGER,
+      unity_price: Sequelize.FLOAT,
+      quantity: Sequelize.INTEGER,
+      unity: Sequelize.STRING,
+      amount: Sequelize.FLOAT,
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      }
+    });
+  },
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.dropTable('PurchaseInvoice_Products');
+  }
+},
+{
+  name: '20200413022230-create-table-purchaseorder-products',
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.createTable('PurchaseOrder_Products', {
+      PurchaseOrderId: Sequelize.INTEGER,
+      ProductId: Sequelize.INTEGER,
+      unity_price: Sequelize.FLOAT,
+      quantity: Sequelize.INTEGER,
+      unity: Sequelize.STRING,
+      amount: Sequelize.FLOAT,
+      cost: Sequelize.FLOAT,
+      designation:  {
+        type: Sequelize.STRING,
+        defaultValue: ''
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      }
+    });
+  },
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.dropTable('PurchaseOrder_Products');
+  }
+},
+{
+  name: '20200413022232-create-table-saleinvoice-products',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('SaleInvoice_Products', {
       SaleInvoiceId: Sequelize.INTEGER,
@@ -638,34 +826,7 @@ module.exports = [
   }
 },
 {
-  name: '20200413022233-create-table',
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('SaleOrders', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      unity_price: {
-        type: Sequelize.FLOAT
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
-    });
-  },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('SaleOrders');
-  }
-},
-{
-  name: '20200413022234-create-table',
+  name: '20200413022234-create-table-saleorder-products',
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('SaleOrder_Products', {
       SaleOrderId: Sequelize.INTEGER,
@@ -688,119 +849,6 @@ module.exports = [
     return queryInterface.dropTable('SaleOrder_Products');
   }
 },
-{
-  name: '20200413022235-add-associations',
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.addColumn(
-      'Payments', // name of Source model
-      'SaleInvoiceId', // name of the key we're adding 
-      {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'SaleInvoices', // name of Target model
-          key: 'id', // key in Target model that we're referencing
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
-      }
-    )
-    .then(() => {
-      return queryInterface.addColumn(
-        'Products', // name of Source model
-        'ProductCategoryId', // name of the key we're adding 
-        {
-          type: Sequelize.INTEGER,
-          references: {
-            model: 'ProductCategories', // name of Target model
-            key: 'id', // key in Target model that we're referencing
-          },
-          onUpdate: 'CASCADE',
-          onDelete: 'SET NULL',
-        }
-      )
-    })
-    .then(() => {
-      return queryInterface.addColumn(
-        'Proformats', // name of Source model
-        'AccountId', // name of the key we're adding 
-        {
-          type: Sequelize.INTEGER,
-          references: {
-            model: 'Accounts', // name of Target model
-            key: 'id', // key in Target model that we're referencing
-          },
-          onUpdate: 'CASCADE',
-          onDelete: 'SET NULL',
-        }
-      )
-    })
-    .then(() => {
-      return queryInterface.addColumn(
-        'PurchaseInvoices', // name of Source model
-        'AccountId', // name of the key we're adding 
-        {
-          type: Sequelize.INTEGER,
-          references: {
-            model: 'Accounts', // name of Target model
-            key: 'id', // key in Target model that we're referencing
-          },
-          onUpdate: 'CASCADE',
-          onDelete: 'SET NULL',
-        }
-      )
-    })
-    .then(() => {
-      return queryInterface.addColumn(
-        'PurchaseOrders', // name of Source model
-        'AccountId', // name of the key we're adding 
-        {
-          type: Sequelize.INTEGER,
-          references: {
-            model: 'Accounts', // name of Target model
-            key: 'id', // key in Target model that we're referencing
-          },
-          onUpdate: 'CASCADE',
-          onDelete: 'SET NULL',
-        }
-      )
-    })
-    .then(() => {
-      return queryInterface.addColumn(
-        'SaleInvoices', // name of Source model
-        'AccountId', // name of the key we're adding 
-        {
-          type: Sequelize.INTEGER,
-          references: {
-            model: 'Accounts', // name of Target model
-            key: 'id', // key in Target model that we're referencing
-          },
-          onUpdate: 'CASCADE',
-          onDelete: 'SET NULL',
-        }
-      )
-    })
-    .then(() => {
-      return queryInterface.addColumn(
-        'SaleOrders', // name of Source model
-        'AccountId', // name of the key we're adding 
-        {
-          type: Sequelize.INTEGER,
-          references: {
-            model: 'Accounts', // name of Target model
-            key: 'id', // key in Target model that we're referencing
-          },
-          onUpdate: 'CASCADE',
-          onDelete: 'SET NULL',
-        }
-      )
-    })
-  },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.removeColumn(
-      'Orders', // name of Source model
-      'CustomerId' // key we want to remove
-    );
-  }
-}
+
 
 ]

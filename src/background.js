@@ -7,9 +7,9 @@ import path from 'path'
 import Umzug from 'umzug'
 import fs from 'fs'
 import fse from 'fs-extra'
-// import image2base64 from 'image-to-base64'
 import DocumentGenerator from './classes/DocumentGenerator.js'
 import migrationsList from './classes/MigrationsList.js'
+import {getParams} from './classes/HelperFunctions.js'
 
 const dbs = require('./models').default;
 let {sequelize, Sequelize} = dbs;
@@ -26,10 +26,10 @@ if (!fs.existsSync(dataDir)){
 let dg;
 
 const umzug = new Umzug({
-  migrations: Umzug.migrationsList(migrationsList, [dbs.sequelize.getQueryInterface(), Sequelize]),
+  migrations: Umzug.migrationsList(migrationsList, [sequelize.getQueryInterface(), Sequelize]),
   storage: 'sequelize',
   storageOptions: {
-    sequelize: dbs.sequelize
+    sequelize: sequelize
   }
 })
 ;(async () => {
@@ -133,49 +133,21 @@ if (isDevelopment) {
 /*
   *** INVOICE CRUD ***
 */
-
-function getParams(modelName) {
-  let itCounts;
-  let isPurchase;
-  
-  switch(modelName) {
-    case 'PurchaseInvoice':
-      itCounts = true; break;
-    case 'SaleInvoice':
-      itCounts = true; break;
-    case 'CounterInvoice':
-      itCounts = true; break;
-    default: 
-      itCounts = false;
-  }
-
-  switch(modelName) {
-    case 'PurchaseInvoice':
-      isPurchase = true; break;
-    case 'PurchaseOrder':
-      isPurchase = true; break;
-    default: 
-      isPurchase = false;
-  }
-
-  return {itCounts, isPurchase}
-}
-
 ipcMain.on('create_invoice', function (event, data) {
   let {invoiceData, invoiceComputed, modelName} = data;
   let {payments, inputs} = invoiceData;
   let invoiceFullData = {...invoiceData, ...invoiceComputed};
   let {itCounts, isPurchase} = getParams(modelName);
 
-  dbs.sequelize.transaction(function (transaction) {
+  sequelize.transaction(function (transaction) {
 
     let productUpdates = inputs.map(input => {
       if (itCounts && modelName == "PurchaseInvoice") {
         return dbs.Product.update({
-          quantity: dbs.sequelize.literal(`(quantity + ${input.product_quantity})`),
-          sum_purchase_price: dbs.sequelize.literal(`(sum_purchase_price + ${input.unity_price})`),
-          average_purchase_price: dbs.sequelize.literal(`(sum_purchase_price + ${input.unity_price}) / (number_purchase_prices + 1)`),
-          number_purchase_prices: dbs.sequelize.literal(`number_purchase_prices + 1`)
+          quantity: sequelize.literal(`(quantity + ${input.product_quantity})`),
+          sum_purchase_price: sequelize.literal(`(sum_purchase_price + ${input.unity_price})`),
+          average_purchase_price: sequelize.literal(`(sum_purchase_price + ${input.unity_price}) / (number_purchase_prices + 1)`),
+          number_purchase_prices: sequelize.literal(`number_purchase_prices + 1`)
         },
           {
             where: {
@@ -187,7 +159,7 @@ ipcMain.on('create_invoice', function (event, data) {
         
       } else if (itCounts && (modelName == 'SaleInvoice' || modelName == 'CounterSale')) {
         return dbs.Product.update({
-          quantity: dbs.sequelize.literal(`(quantity - ${input.product_quantity})`),
+          quantity: sequelize.literal(`(quantity - ${input.product_quantity})`),
         },
           {
             where: {
@@ -265,7 +237,7 @@ ipcMain.on('update_invoice', function (event, data) {
   let invoiceFullData = {...invoiceData, ...invoiceComputed};
   let {itCounts, isPurchase} = getParams(modelName);
   
-  dbs.sequelize.transaction(function (transaction) {
+  sequelize.transaction(function (transaction) {
 
     return dbs[modelName + '_Product'].findAll({
       where: {
@@ -281,10 +253,10 @@ ipcMain.on('update_invoice', function (event, data) {
       let resetProducts = items.map((item) => {
         if (modelName == "PurchaseInvoice") {
           return dbs.Product.update({
-            quantity: dbs.sequelize.literal(`(quantity - ${item.quantity})`),
-            sum_purchase_price: dbs.sequelize.literal(`(sum_purchase_price - ${item.unity_price})`),
-            average_purchase_price: dbs.sequelize.literal(`(sum_purchase_price - ${item.unity_price}) / (number_purchase_prices - 1)`),
-            number_purchase_prices: dbs.sequelize.literal(`number_purchase_prices - 1`)
+            quantity: sequelize.literal(`(quantity - ${item.quantity})`),
+            sum_purchase_price: sequelize.literal(`(sum_purchase_price - ${item.unity_price})`),
+            average_purchase_price: sequelize.literal(`(sum_purchase_price - ${item.unity_price}) / (number_purchase_prices - 1)`),
+            number_purchase_prices: sequelize.literal(`number_purchase_prices - 1`)
           },
             {
               where: {
@@ -295,7 +267,7 @@ ipcMain.on('update_invoice', function (event, data) {
           )
         } else if (modelName == 'SaleInvoice' || modelName == 'CounterSale') {
           return dbs.Product.update({
-            quantity: dbs.sequelize.literal(`(quantity + ${item.quantity})`),
+            quantity: sequelize.literal(`(quantity + ${item.quantity})`),
           },
             {
               where: {
@@ -316,10 +288,10 @@ ipcMain.on('update_invoice', function (event, data) {
       let productUpdates = inputs.map(input => {
         if (modelName == "PurchaseInvoice") {
           return dbs.Product.update({
-            quantity: dbs.sequelize.literal(`(quantity + ${input.product_quantity})`),
-            sum_purchase_price: dbs.sequelize.literal(`(sum_purchase_price + ${input.unity_price})`),
-            average_purchase_price: dbs.sequelize.literal(`(sum_purchase_price + ${input.unity_price}) / (number_purchase_prices + 1)`),
-            number_purchase_prices: dbs.sequelize.literal(`number_purchase_prices + 1`)
+            quantity: sequelize.literal(`(quantity + ${input.product_quantity})`),
+            sum_purchase_price: sequelize.literal(`(sum_purchase_price + ${input.unity_price})`),
+            average_purchase_price: sequelize.literal(`(sum_purchase_price + ${input.unity_price}) / (number_purchase_prices + 1)`),
+            number_purchase_prices: sequelize.literal(`number_purchase_prices + 1`)
           },
             {
               where: {
@@ -331,7 +303,7 @@ ipcMain.on('update_invoice', function (event, data) {
           
         } else if (modelName == 'SaleInvoice' || modelName == 'CounterSale') {
           return dbs.Product.update({
-            quantity: dbs.sequelize.literal(`(quantity - ${input.product_quantity})`),
+            quantity: sequelize.literal(`(quantity - ${input.product_quantity})`),
           },
             {
               where: {
@@ -477,7 +449,7 @@ ipcMain.on('get_recette_tasks', function (event, searchData) {
       }
     },
     attributes: [
-        [dbs.Sequelize.fn('DISTINCT', dbs.Sequelize.col('task')), 'task'],
+        [Sequelize.fn('DISTINCT', Sequelize.col('task')), 'task'],
     ],
     raw: true,
   })
@@ -774,5 +746,10 @@ ipcMain.on('print', function (event, data) {
 });
 
 /*
-  *** GET CODE ***
+  *** PRINT FUNCTION ***
 */
+
+// returns a promise i think
+function print(data, doc) {
+  return dg.pdf(data, doc);
+}

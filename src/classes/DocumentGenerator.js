@@ -53,8 +53,8 @@ class DocumentGenerator {
 		}
 	}
 
-	// documentDatasArray as array
-	async pdf(documentDatasArray, documentType) {
+	// datasArray as array
+	async pdf(datasArray, documentType) {
 		try {
 			let executablePath = '';
 			if (fs.existsSync(`C:\\Program Files (x86)\\Google\\`)) {
@@ -77,9 +77,12 @@ class DocumentGenerator {
 			let filePaths = [];
 			let finalFilePath;
 
-			for (let i = 0; i < documentDatasArray.length; i++) {
+			for (let i = 0; i < datasArray.length; i++) {
+				console.log('data.date', datasArray[i].date)
+				datasArray[i].formattedDate = new moment(datasArray[i].date).format('DD-MM-YYYY');
+				datasArray[i].printedAt = new moment().format('DD-MM-YYYYTHH.mm.ss')
 				const outputName = `${documentType} document ${date} N${i}`;
-				let html = await this.html(documentDatasArray[i], documentType);
+				let html = await this.html(datasArray[i], documentType);
 				let filePath = path.join(this.dirDocFiles, `/documents/${outputName}.pdf`);
 				let options = {
 					path: filePath,
