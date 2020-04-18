@@ -15,7 +15,7 @@
           
         <CreateInvoice
           modelName="PurchaseInvoice"
-          accountRequired="false"
+          :accountRequired="false"
         />
 
       </b-tab-item>

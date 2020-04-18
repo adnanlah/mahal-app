@@ -6,7 +6,6 @@ module.exports = (sequelize, DataTypes) => {
     description: DataTypes.STRING,
     brand: DataTypes.STRING,
     selling_price: DataTypes.FLOAT,
-    image_path: DataTypes.STRING,
     sum_purchase_price: {
       type: DataTypes.FLOAT,
       allowNull: false,
@@ -38,6 +37,7 @@ module.exports = (sequelize, DataTypes) => {
     Product.belongsToMany(models.SaleOrder, {through: 'SaleOrder_Product'})
     Product.belongsToMany(models.Proformat, {through: 'Proformat_Product'})
     Product.belongsTo(models.ProductCategory);
+    Product.belongsTo(models.Image);
   };
   return Product;
 };

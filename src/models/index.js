@@ -35,7 +35,7 @@ const sequelize = new Sequelize(
       },
       beforeUpdate(model, options) {
         model.updatedAt = moment().tz("Africa/Algiers").format();
-      }
+      },
     }
   }
 );

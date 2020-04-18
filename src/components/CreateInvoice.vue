@@ -31,7 +31,7 @@
                     v-for="(trend, idx) in trends"
                     type="is-dark"
                     :key="idx"
-                    @click="input.ProductID = trend.dataValues.ID">{{trend.dataValues.name}}
+                    @click="input.ProductId = trend.dataValues.id">{{trend.dataValues.name}}
                     </b-tag>
                   </b-taglist>
                   <div v-else>
@@ -83,7 +83,7 @@
                   <b-field expanded label="Fournisseur" label-position="on-border">
                     <b-select
                       :disabled="withoutSupplier"
-                      v-model="invoice.invoiceData.SupplierID"
+                      v-model="invoice.invoiceData.SupplierId"
                       icon="account"
                       required
                       expanded
@@ -91,7 +91,7 @@
                         <option
                             v-for="(inp, ind) in suppliers"
                             :key="ind"
-                            :value="inp.ID">
+                            :value="inp.id">
                           {{inp.name}}
                         </option>
                     </b-select>
@@ -100,7 +100,7 @@
                     </p>
                   </b-field>
                   <b-field label="Code" label-position="on-border">
-                    <b-input class="input-code" v-model="invoice.invoiceData.SupplierID" placeholder="F0001.."></b-input>
+                    <b-input class="input-code" v-model="invoice.invoiceData.SupplierId" placeholder="F0001.."></b-input>
                   </b-field>
                 </b-field>
                 
@@ -108,26 +108,26 @@
                   <b-field expanded label="Client" label-position="on-border">
                     <b-select
                     expanded
-                    v-model="invoice.invoiceData.ClientID"
+                    v-model="invoice.invoiceData.ClientId"
                     icon="account"
                     required
                     placeholder="Client">
                         <option
                         v-for="(client, idx) in clients"
                         :key="idx"
-                        :value="client.ID">{{client.name}}</option>
+                        :value="client.id">{{client.name}}</option>
                     </b-select>
                     <p class="control">
                       <b-button class="button is-link" icon-left="account-plus" @click="isAccountModalActive = true"></b-button>
                     </p>
                   </b-field>
                   <b-field label="Code" label-position="on-border">
-                    <b-input class="input-code" v-model="invoice.invoiceData.ClientID" placeholder="C0001.."></b-input>
+                    <b-input class="input-code" v-model="invoice.invoiceData.ClientId" placeholder="C0001.."></b-input>
                   </b-field>
                 </b-field>
 
                 <b-field v-if="isPurchase" label="N de facture" label-position="on-border">
-                  <b-input v-model="invoice.invoiceData.number" :disabled="invoice.invoiceData.SupplierID == null" required></b-input>
+                  <b-input v-model="invoice.invoiceData.number" :disabled="invoice.invoiceData.SupplierId == null" required></b-input>
                 </b-field>
 
                 <b-field
@@ -298,14 +298,14 @@
 
 <script>
 // @ is an alias to /src
-import InvoiceItem from './InvoiceItem.vue'
 import {ipcRenderer} from 'electron';
+import InvoiceItem from '@/components/InvoiceItem.vue'
 import AccountModalForm from '@/components/AccountModalForm';
 import numberToText from '@/assets/js/numberToText';
 
 class Invoice {
   constructor(invoice) {
-    this.ID = invoice ? invoice.ID : null;
+    // this.id = invoice ? invoice.id : null;
     this.number = invoice ? invoice.number : '';
     this.tva_percentage = invoice ? invoice.tva_percentage : 0;
     this.payment_method = invoice ? invoice.payment_method : '';
@@ -314,8 +314,8 @@ class Invoice {
     this.timbres = invoice ? invoice.timbres : 0;
     this.fully_paid = invoice ? invoice.fully_paid : true;
     this.amount_text = invoice ? invoice.amount_text : '';
-    this.ClientID = invoice ? invoice.ClientID : null;
-    this.SupplierID = invoice ? invoice.SupplierID : null;
+    this.ClientId = invoice ? invoice.ClientId : null;
+    this.SupplierId = invoice ? invoice.SupplierId : null;
     this.date = invoice ? new Date(invoice.date) : new Date();
     // this.date = invoice ? invoice.date : '';
     this.debt_last_date = invoice ? invoice.debt_last_date : '';
@@ -329,12 +329,11 @@ class Invoice {
 class Input {
   constructor(item) {
     this.orderNumber = Input.incrementId()
-    this.ProductID = item ? item.ProductID : '',
+    this.ProductId = item ? item.ProductId : '',
     this.unity_price = item ? item.unity_price : null,
-    this.product_unity = item ? item.product_unity : 'U',
-    this.product_quantity = item ? item.product_quantity : 1,
-    this.product_amount = item ? item.product_amount : 0,
-    // this.counts = item ? item.counts : this.itCounts,
+    this.unity = item ? item.unity : 'U',
+    this.quantity = item ? item.quantity : 1,
+    this.amount = item ? item.amount : 0,
     this.productData = {};
   }
 
@@ -346,8 +345,8 @@ class Input {
 }
 
 class Payment {
-  constructor(item, invoiceID) {
-    this.ID = item ? item.ID : null,
+  constructor(item) {
+    this.id = item ? item.id : null,
     this.number = item ? item.number : 0,
     this.amount = item ? item.amount : 0
     this.date = item ? new Date(item.date) : new Date();
@@ -407,15 +406,19 @@ export default {
       withoutSupplier: false,
       inputColumns: [
         {
+            field: 'ProductId',
+            label: 'Code',
+        },
+        {
             field: 'designation',
             label: 'Désignation',
         },
         {
-            field: 'product_unity',
+            field: 'unity',
             label: 'U',
         },
         {
-            field: 'product_quantity',
+            field: 'quantity',
             label: 'Quantité',
         },
         {
@@ -423,7 +426,7 @@ export default {
             label: "Prix d'unité",
         },
         {
-            field: 'product_amount',
+            field: 'amount',
             label: 'Montant',
         },
       ],
@@ -438,7 +441,7 @@ export default {
       return this.forcedModelName ? this.forcedModelName : this.modelName;
     },
     selected() {
-      return this.invoice.inputs.map(i => i.ProductID);
+      return this.invoice.inputs.map(i => i.ProductId);
     },
     isUpdate() {
       return this.forcedUpdate !== null ? this.forcedUpdate : this.isUpdateProp;
@@ -474,7 +477,7 @@ export default {
         })
     },
     pretax_amount: function() {
-        return this.invoice.inputs.map(input => input.unity_price * input.product_quantity).reduce((acc, cur) => {return Number(acc) + Number(cur)}, 0);
+        return this.invoice.inputs.map(input => input.unity_price * input.quantity).reduce((acc, cur) => {return Number(acc) + Number(cur)}, 0);
     },
     tva: function() {
         return this.pretax_amount * this.invoice.invoiceData.tva_percentage / 100;
@@ -616,7 +619,7 @@ export default {
     deleteInvoice() {
       ipcRenderer.send('delete_invoice', {
         modelName: this.modelName,
-        id: this.invoice.ID
+        id: this.invoice.id
       })
     },
     

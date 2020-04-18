@@ -96,6 +96,7 @@ import {ipcRenderer} from 'electron';
     data() {
       return {
         accountData: {
+          id: '',
           name: '',
           type: 'client',
         },

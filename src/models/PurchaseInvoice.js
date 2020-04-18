@@ -1,6 +1,12 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const PurchaseInvoice = sequelize.define('PurchaseInvoice', {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER
+    },
     number: DataTypes.STRING(100),
     date: DataTypes.STRING(100),
     payment_method: DataTypes.STRING(100),

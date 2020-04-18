@@ -6,7 +6,7 @@ import moment from 'moment'
 import path from 'path'
 import Umzug from 'umzug'
 import fs from 'fs'
-import fse from 'fs-extra'
+// import fse from 'fs-extra'
 import DocumentGenerator from './classes/DocumentGenerator.js'
 import migrationsList from './classes/MigrationsList.js'
 import {getParams} from './classes/HelperFunctions.js'
@@ -22,23 +22,34 @@ if (!fs.existsSync(dataDir)){
     fs.mkdirSync(path.join(dataDir, '/documents'), { recursive: true });
     fs.mkdirSync(path.join(dataDir, '/productsimages'), { recursive: true });
 }
-// let dg = new DocumentGenerator(dataDir, documentsDir);
-let dg;
+let dg = new DocumentGenerator(dataDir, documentsDir);
+// let dg;
+
+// const umzug = new Umzug({
+//   migrations: Umzug.migrationsList(migrationsList, [sequelize.getQueryInterface(), Sequelize]),
+//   storage: 'sequelize',
+//   storageOptions: {
+//     sequelize: sequelize
+//   }
+// });
 
 const umzug = new Umzug({
-  migrations: Umzug.migrationsList(migrationsList, [sequelize.getQueryInterface(), Sequelize]),
+  migrations: {
+    path: './src/migrations',
+    params: [
+      sequelize.getQueryInterface(), Sequelize
+    ]
+  },
   storage: 'sequelize',
-  storageOptions: {
-    sequelize: sequelize
-  }
-})
-;(async () => {
+  storageOptions: { sequelize }
+});
+(async () => {
   try {
     await umzug.up()
+    console.log('All migrations performed successfully')
   } catch(e) {
     console.log('Umzug Error', e)
   }
-  console.log('All migrations performed successfully')
 })()
 
 import {
@@ -134,8 +145,8 @@ if (isDevelopment) {
   *** INVOICE CRUD ***
 */
 ipcMain.on('create_invoice', function (event, data) {
-  let {invoiceData, invoiceComputed, modelName} = data;
-  let {payments, inputs} = invoiceData;
+  let {invoice, invoiceComputed, modelName} = data;
+  let {payments, inputs, invoiceData} = invoice;
   let invoiceFullData = {...invoiceData, ...invoiceComputed};
   let {itCounts, isPurchase} = getParams(modelName);
 
@@ -144,14 +155,14 @@ ipcMain.on('create_invoice', function (event, data) {
     let productUpdates = inputs.map(input => {
       if (itCounts && modelName == "PurchaseInvoice") {
         return dbs.Product.update({
-          quantity: sequelize.literal(`(quantity + ${input.product_quantity})`),
-          sum_purchase_price: sequelize.literal(`(sum_purchase_price + ${input.unity_price})`),
-          average_purchase_price: sequelize.literal(`(sum_purchase_price + ${input.unity_price}) / (number_purchase_prices + 1)`),
-          number_purchase_prices: sequelize.literal(`number_purchase_prices + 1`)
-        },
+            quantity: sequelize.literal(`(quantity + ${input.quantity})`),
+            sum_purchase_price: sequelize.literal(`(sum_purchase_price + ${input.unity_price})`),
+            average_purchase_price: sequelize.literal(`(sum_purchase_price + ${input.unity_price}) / (number_purchase_prices + 1)`),
+            number_purchase_prices: sequelize.literal(`number_purchase_prices + 1`)
+          },
           {
             where: {
-              ID: input.ProductID
+              id: input.ProductId
             },
             transaction
           }
@@ -159,11 +170,11 @@ ipcMain.on('create_invoice', function (event, data) {
         
       } else if (itCounts && (modelName == 'SaleInvoice' || modelName == 'CounterSale')) {
         return dbs.Product.update({
-          quantity: sequelize.literal(`(quantity - ${input.product_quantity})`),
-        },
+            quantity: sequelize.literal(`(quantity - ${input.quantity})`),
+          },
           {
             where: {
-              ID: input.ProductID
+              id: input.ProductId
             },
             transaction
           }
@@ -177,7 +188,7 @@ ipcMain.on('create_invoice', function (event, data) {
     .then(() => {
       let productsPromises = dbs.Product.findAll({
         where: {
-          ID: {[Op.or]: inputs.map(i => i.ProductID)} }
+          id: {[Op.or]: inputs.map(i => i.ProductId)} }
         }, {transaction});
       let createInvoicePromise = dbs[modelName].create(invoiceFullData, {
         include: invoiceFullData.payments ? [ dbs.Payment ] : [],
@@ -189,16 +200,16 @@ ipcMain.on('create_invoice', function (event, data) {
       products.map((p) => {
         let m_p = Object.assign({
           counts: itCounts,
-        }, inputs.filter(i => i.ProductID === p.ID)[0]);
+        }, inputs.filter(i => i.ProductId === p.id)[0]);
         return p[modelName + '_Product'] = m_p;
       })
-      return Promise.all([invoice.setItems(products, { through: {}, transaction}), invoice]);
+      return Promise.all([invoice.setItems(products, { through: {}, individualHooks: true, transaction}), invoice]);
     })
 
   })
   .then((results) => {
-    if (invoiceData.isPrinted) {
-      return dbs[modelName].findByPk(results[1].dataValues.ID, {
+    if (invoice.isPrinted) {
+      return dbs[modelName].findByPk(results[1].dataValues.id, {
         include: [{model: dbs.Product, as: 'Items'}]
       })
     } else {
@@ -212,13 +223,15 @@ ipcMain.on('create_invoice', function (event, data) {
     else
       return null;
   })
-  .then((openFile) => {
-    if (openFile)
-      shell.openItem(openFile);
-    else 
-      return null;
-  })
-  .then(() => {
+  // .then((openFile) => {
+  //   if (openFile)
+  //     shell.openItem(openFile);
+  //   else 
+  //     return null;
+  // })
+  .then((pdf) => {
+    console.log('pdf' ,pdf)
+    console.log('typeof pdf' ,typeof pdf)
     return dbs.Log.create({
       message: 'Facture a été bien crée.'
     })
@@ -227,7 +240,7 @@ ipcMain.on('create_invoice', function (event, data) {
     return event.sender.send('invoice_created', {status: true, message: `Facture bien ajouté!`});
   })
   .catch(function (e) {
-    console.log('Transaction has been rolled back: ', e.message)
+    console.log('Transaction has been rolled back: ', e)
     return event.sender.send('invoice_created', {status: false, message: `Facture pas bien ajouté ${e.message}`});
   });
 });
@@ -241,7 +254,7 @@ ipcMain.on('update_invoice', function (event, data) {
 
     return dbs[modelName + '_Product'].findAll({
       where: {
-        '${modelName} + ID': invoiceData.ID
+        '${modelName} + id': invoiceData.id
       }
     }, {
       transaction
@@ -260,7 +273,7 @@ ipcMain.on('update_invoice', function (event, data) {
           },
             {
               where: {
-                ID: item.ProductID
+                id: item.ProductId
               },
               transaction
             }
@@ -271,7 +284,7 @@ ipcMain.on('update_invoice', function (event, data) {
           },
             {
               where: {
-                ID: item.ProductID
+                id: item.ProductId
               },
               transaction
             }
@@ -288,14 +301,14 @@ ipcMain.on('update_invoice', function (event, data) {
       let productUpdates = inputs.map(input => {
         if (modelName == "PurchaseInvoice") {
           return dbs.Product.update({
-            quantity: sequelize.literal(`(quantity + ${input.product_quantity})`),
+            quantity: sequelize.literal(`(quantity + ${input.quantity})`),
             sum_purchase_price: sequelize.literal(`(sum_purchase_price + ${input.unity_price})`),
             average_purchase_price: sequelize.literal(`(sum_purchase_price + ${input.unity_price}) / (number_purchase_prices + 1)`),
             number_purchase_prices: sequelize.literal(`number_purchase_prices + 1`)
           },
             {
               where: {
-                ID: input.ProductID
+                id: input.ProductId
               },
               transaction
             }
@@ -303,11 +316,11 @@ ipcMain.on('update_invoice', function (event, data) {
           
         } else if (modelName == 'SaleInvoice' || modelName == 'CounterSale') {
           return dbs.Product.update({
-            quantity: sequelize.literal(`(quantity - ${input.product_quantity})`),
+            quantity: sequelize.literal(`(quantity - ${input.quantity})`),
           },
             {
               where: {
-                ID: input.ProductID
+                id: input.ProductId
               },
               transaction
             }
@@ -330,11 +343,11 @@ ipcMain.on('update_invoice', function (event, data) {
     .then(([payments]) => {
       let productsPromises = dbs.Product.findAll({
         where: {
-          ID: {[Op.or]: inputs.map(i => i.ProductID)} }
+          id: {[Op.or]: inputs.map(i => i.ProductId)} }
         }, {transaction});
       let updatePromise = dbs[modelName].update(invoiceFullData, {
         where: {
-          ID: invoiceFullData.ID
+          id: invoiceFullData.id
         }, transaction
       })
 
@@ -342,7 +355,7 @@ ipcMain.on('update_invoice', function (event, data) {
     })
     .then(([products, updatedInvoice, payments]) => {
       products.map((p) => {
-        return p[modelName + '_Product'] = inputs.filter(i => i.ProductID === p.ID)[0];
+        return p[modelName + '_Product'] = inputs.filter(i => i.ProductId === p.id)[0];
       })
       updatedInvoice.setPayments(payments, { through: {}, transaction});
       return updatedInvoice.setItems(products, { through: {}, transaction});
@@ -368,7 +381,7 @@ ipcMain.on('delete_invoice', function (event, invoiceData) {
   let {id, modelName} = invoiceData;
   dbs[modelName].destroy({
       where: {
-          ID: id
+          id
       }
   }).then((r) => {
     return event.sender.send('invoice_deleted', {status: true, message: `Facture bien supprimé!`});
@@ -405,7 +418,7 @@ ipcMain.on('create_recette', (event, data) => {
 ipcMain.on('update_recette', (event, recette) => {
   dbs.Recette.update(recette, {
       where: {
-        ID: recette.ID
+        id: recette.id
       }
     })
     .then((recette) => {
@@ -552,21 +565,13 @@ ipcMain.on('get_overdue_invoices', function (event, searchData) {
 /*
   *** PRODUCT CRUD ***
 */
-
 ipcMain.on('create_product', function (event, productData) {
-  const imageExtension = productData.image_path.split('.').pop();
-  const imageName = `${productData.ProductCategoryID}-${productData.name}-${Math.random().toString(36).substr(2, 5)}`;
-  const originalImagePath = productData.image_path;
-  productData.image_path = `/productsimages/${imageName}.${imageExtension}`;
-  const copyDest = path.join(dataDir, productData.image_path);
-  
   dbs.Product.create(productData)
   .then((product) => {
-    if (productData.originalImagePath) {
-      return fse.copyFile(originalImagePath, copyDest);
-    } else {
+    if (productData.image.base64)
+      return product.addImage(productData.image)
+    else
       return null
-    }
   })
   .then(() => {
     event.sender.send('product_created', {status: true, message: 'Produit a été bien créé!'});
@@ -575,18 +580,19 @@ ipcMain.on('create_product', function (event, productData) {
 });
 
 ipcMain.on('update_product', function (event, productData) {
-  const imageExtension = productData.image_path.split('.').pop();
-  const imageName = `${productData.ProductCategoryID}-${productData.name}-${Math.random().toString(36).substr(2, 5)}`;
-  const originalImagePath = productData.image_path;
-  productData.image_path = `/productsimages/${imageName}.${imageExtension}`;
-  const copyDest = path.join(dataDir, productData.image_path);
-  
   return dbs.Product.update(productData, {
     where: {
-      ID: productData.ID
+      id: productData.id
     }
   })
   .then((product) => {
+    return dbs.Image.update({base64: productData.image.base64}, {
+      where: {
+        id: product.ImageId
+      }
+    })
+  })
+  .then(() => {
     event.sender.send('product_updated', {status: true, message: 'Success'});
   })
   .catch(e => event.sender.send('product_updated', {status: false, message: `Erreur modification du produit, ${e.message}`}))
@@ -636,16 +642,11 @@ ipcMain.on('get_all_products', function (event, value) {
   // .catch(e => console.log(`error finding all raw productCategories ${e.message}`))
 
   dbs.ProductCategory.findAll({
-    include: [dbs.Product],
+    include: [{model: dbs.Product, include: [dbs.Image]}],
     raw: false // make it false next
   })
   .then((productCategories) => {
     return productCategories.map((pc) => {
-      pc.Products.map((p) => {
-        const np = p;
-        np.dataValues.image_path = path.join(dataDir, String(p.dataValues.image_path));
-        return np
-      })
       return pc;
     })
   })
@@ -664,7 +665,7 @@ ipcMain.on('print_all_products', function (event, value) {
   .then((productCategories) => {
     if (isPrinted) {
       let openFile = dg.pdf([productCategories], 'products');
-      shell.openItem(openFile);
+      return shell.openItem(openFile);
     }
   })
   .catch(e => event.sender.send('error', `error finding all productCategories ${e.message}`))
@@ -672,18 +673,15 @@ ipcMain.on('print_all_products', function (event, value) {
 
 ipcMain.on('get_next_product_id', function (event, value) {
   dbs.Product.findOne({
-    where: {
-
-    },
     order: [ [ 'createdAt', 'DESC' ]]
   })
   .then((product) => {
     if (product)
-      event.sender.send('next_product_id', Number(product.dataValues.ID) + 1);
+      return event.sender.send('next_product_id', Number(product.dataValues.id) + 1);
     else
-      event.sender.send('next_product_id', 1);
+      return event.sender.send('next_product_id', 1);
   })
-  .catch(e => event.sender.send('error', `error get_last_product_id ${e.message}`))
+  .catch(e => event.sender.send('error', `error next_product_id ${e.message}`))
 
 })
 
@@ -699,7 +697,7 @@ ipcMain.on('set_company', function (event, companyData) {
     if(rec)
       return dbs.Company.update(companyData, {
         where: {
-          ID: 1
+          id: 1
         }
       });
     // insert

@@ -3,25 +3,32 @@
     <form @submit.prevent="onSubmit">
       <div class="modal-card" style="width: auto">
           <header class="modal-card-head">
-              <p v-if="isUpdate" class="modal-card-title">Modifier la recette</p>
-              <p v-else class="modal-card-title">Ajouter une recette</p>
+              <p v-if="isUpdate" class="modal-card-title">Modifier la transaction</p>
+              <p v-else class="modal-card-title">Ajouter une transaction</p>
           </header>
           <section class="modal-card-body">
             <div class="columns">
               <div class="column is-6">
                 <b-field label="Montant (DA)">
-                  <b-input v-model.number="recetteData.amount" required>
+                  <b-select v-model="transactionData.type" placeholder="In ou Out" required>
+                    <option value="in">Recette</option>
+                    <option value="out">Depense</option>
+                    </b-select>
+                </b-field>
+
+                <b-field label="Montant (DA)">
+                  <b-input v-model.number="transactionData.amount" required>
                     </b-input>
                 </b-field>
 
                 <b-field label="Montant (en lettres)">
-                  <b-input disabled v-model.number="recetteData.amount_text" >
+                  <b-input disabled v-model.number="transactionData.amount_text" >
                     </b-input>
                 </b-field>
 
                 <b-field label="Le motif">
                   <b-input
-                      v-model="recetteData.motive"
+                      v-model="transactionData.motive"
                       placeholder=""
                       required>
                   </b-input>
@@ -31,7 +38,7 @@
               <div class="column is-6">
                 <b-field label="Nom de client">
                   <b-input
-                      v-model="recetteData.client_name"
+                      v-model="transactionData.client_name"
                       placeholder="Nom.."
                       required>
                   </b-input>
@@ -39,7 +46,7 @@
 
                 <b-field label="Note sur le client">
                   <b-input
-                      v-model="recetteData.client_info"
+                      v-model="transactionData.client_info"
                       placeholder="Tel.."
                       >
                   </b-input>
@@ -49,7 +56,7 @@
                   <b-datepicker
                       placeholder="Choisi la date.."
                       icon="calendar-today"
-                      v-model="recetteData.date"
+                      v-model="transactionData.date"
                       required>
                   </b-datepicker>
                 </b-field>
@@ -82,15 +89,17 @@ import {ipcRenderer} from 'electron';
 import numberToText from '@/assets/js/numberToText';
 
 export default {
-  name: 'RecetteModalForm',
+  name: 'TransactionModalForm',
   components: {
   },
   props: [
-    'data'
+    'data',
+    'type'
   ],
   data() {
     return {
-      recetteData: {
+      transactionData: {
+        type: null,
         amount: '',
         amount_text: '',
         client_name: '',
@@ -99,9 +108,7 @@ export default {
         full_date: new Date(),
         date: '',
       },
-      tasks: [
-        'Bricolage',
-      ],
+      
       isPrinted: true,
       action: '',
       message: '',
@@ -111,17 +118,23 @@ export default {
   computed: {
     isUpdate() {
       return this.data ? true : false;
+    },
+    classes() {
+      if (this.transactionData.type == 'recette')
+        return this.$store.getters.RECETTE_MOTIVES;
+      else
+        return this.$store.getters.DEPENSE_DESIGNATIONS;
     }
   },
   watch: {
-    'recetteData.amount': {
+    'transactionData.amount': {
       handler: function(after, before) {
         if (after)
-          this.recetteData.amount_text = numberToText(after)
+          this.transactionData.amount_text = numberToText(after)
       },
       deep: true
     },
-    'recetteData.full_date': {
+    'transactionData.full_date': {
       immediate: true,
       handler: function(after, before) {
         if (typeof after == Object) {
@@ -136,31 +149,32 @@ export default {
   },
   mounted() {
     if (this.data) {
-      this.recetteData = this.data;
+      this.transactionData = this.data;
     }
+    this.transactionData.type = this.type;
   },
   methods: {
     onSubmit() {
       this.isLoading = true;
       if (this.action == 'delete') {
-        this.onDeleteRecette()
+        this.onDeleteTransaction()
       } else if (this.action == 'update') {
-        this.onUpdateRecette()
+        this.onUpdateTransaction()
       } else if (this.action == 'add') {
-        this.onCreateRecette();
+        this.onCreateTransaction();
       }
-      ipcRenderer.on('recette_created', (event, result) => {
+      ipcRenderer.on('transaction_created', (event, result) => {
         this.isLoading = false;
         console.log("result", result)
         if (result.status) {
-            this.recetteData = {};
+            this.transactionData = {};
             this.successToast(result.message);
         } else {
           this.failToast(result.message);
         }
       })
 
-      ipcRenderer.on('recette_updated', (event, result) => {
+      ipcRenderer.on('transaction_updated', (event, result) => {
         this.isLoading = false;
         if (result.status) {
             this.successToast(result.message);
@@ -169,7 +183,7 @@ export default {
         }
       })
 
-      ipcRenderer.on('recette_deleted', (event, result) => {
+      ipcRenderer.on('transaction_deleted', (event, result) => {
         this.isLoading = false;
         if (result.status) {
             this.$parent.close();
@@ -180,26 +194,26 @@ export default {
       })
     },
 
-    // Recette SEND
-    onCreateRecette() {
-      ipcRenderer.send('create_recette', {
-        recetteData: this.recetteData,
+    // Transaction SEND
+    onCreateTransaction() {
+      ipcRenderer.send('create_transaction', {
+        transactionData: this.transactionData,
         isPrinted: this.isPrinted
       });
     },
-    onUpdateRecette() {
-      ipcRenderer.send('update_recette', {
-        recetteData: this.recetteData,
+    onUpdateTransaction() {
+      ipcRenderer.send('update_transaction', {
+        transactionData: this.transactionData,
         isPrinted: this.isPrinted
       });
     },
-    onDeleteRecette() {
-      ipcRenderer.send('delete_recette', this.recetteData.ID);
+    onDeleteTransaction() {
+      ipcRenderer.send('delete_transaction', this.transactionData.ID);
     },
 
     print() {
-      console.log('printing', this.recetteData)
-      ipcRenderer.send('print', {data: [this.recetteData], type: 'receiptvoucher'});
+      console.log('printing', this.transactionData)
+      ipcRenderer.send('print', {data: [this.transactionData], type: 'receiptvoucher'});
     }
 
   }

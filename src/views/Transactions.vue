@@ -79,7 +79,7 @@
                  :loading="isLoading"
                  @close="clearData"
                  aria-modal>
-            <RecetteModalForm :data="data"></RecetteModalForm>
+            <TransactionModalForm :data="data"></TransactionModalForm>
         </b-modal>
 
 	</div>
@@ -87,11 +87,11 @@
 
 <script>
 	import {ipcRenderer} from 'electron';
-	import RecetteModalForm from '@/components/RecetteModalForm';
+	import TransactionModalForm from '@/components/TransactionModalForm';
 	export default {
 		name: 'Recettes',
 		components: {
-			RecetteModalForm
+			TransactionModalForm
 		},
 		data() {
 			return {

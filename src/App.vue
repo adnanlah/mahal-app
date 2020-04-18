@@ -43,28 +43,9 @@
                 </b-dropdown-item>
             </b-dropdown>
 
-            <b-dropdown aria-role="list">
-                <a
-                    class="navbar-item"
-                    slot="trigger">
-                    LA CAISSE
-                    <b-icon icon="menu-down"></b-icon>
-                </a>
-                <b-dropdown-item aria-role="listitem">
-                  <b-navbar-item tag="router-link" :to="{ path: '/recettes' }">
-                    RECETTES
-                  </b-navbar-item>
-                </b-dropdown-item>
-                <b-dropdown-item aria-role="listitem">
-                  <b-navbar-item tag="router-link" :to="{ path: '/depenses' }">
-                    DEPENSES
-                  </b-navbar-item>
-                </b-dropdown-item>
-            </b-dropdown>
-            
-            <!-- <b-navbar-item tag="router-link" :to="{ path: '/countersale' }">
-                Vente Comptoir
-            </b-navbar-item> -->
+            <b-navbar-item tag="router-link" :to="{ path: '/transactions' }">
+                LA CAISSE
+            </b-navbar-item>
             <b-navbar-item tag="router-link" :to="{ path: '/inventory' }">
                 LE STOCK
             </b-navbar-item>
@@ -79,6 +60,9 @@
             </b-navbar-item>
             <b-navbar-item tag="router-link" :to="{ path: '/logs' }">
                 HISTORIQUE
+            </b-navbar-item>
+            <b-navbar-item tag="router-link" :to="{ path: '/testview' }">
+                PDF
             </b-navbar-item>
 
         </template>

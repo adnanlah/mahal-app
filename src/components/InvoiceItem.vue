@@ -2,13 +2,13 @@
 	<form @submit.prevent="onSubmit">
 		<b-field grouped expanded>
 			<b-field label="Code">
-            	<b-input class="input-code" required v-model="input.ProductID"></b-input>
+            	<b-input class="input-code" required v-model="input.ProductId"></b-input>
           	</b-field>
           	<b-field label="Produit" expanded>
 	            <b-field>
 		            <b-select
 		            :loading="isLoading"
-		            v-model="input.ProductID"
+		            v-model="input.ProductId"
 		            placeholder="Choisi un produit"
 		            @input="productSelected"
 		            required
@@ -17,10 +17,10 @@
 							<optgroup v-for="(pc, idx) in productCategories" :key="idx" :label="pc.dataValues.name">
 							<template v-for="(prod, idx2) in pc.Products">
 							  <option
-							      :class="{disabled: (!isPurchase && !prod.dataValues.quantity) || selected.includes(prod.dataValues.ID)}"
-							      :disabled="selected.includes(prod.dataValues.ID) || (prod.dataValues.quantity == 0 && !isPurchase)"
+							      :class="{disabled: (!isPurchase && !prod.dataValues.quantity) || selected.includes(prod.dataValues.id)}"
+							      :disabled="selected.includes(prod.dataValues.id) || (prod.dataValues.quantity == 0 && !isPurchase)"
 							      :key="idx2"
-							      :value="prod.dataValues.ID">
+							      :value="prod.dataValues.id">
 							        {{prod.dataValues.name}}
 							        {{!isPurchase ? '(Q: ' + prod.dataValues.quantity + ')' : ''}}
 							  </option>
@@ -39,25 +39,25 @@
           </b-field>
 
           <b-field label="Unité">
-            <b-input style="width: 60px;" required controls-position="compact" type="is-light" v-model="input.product_unity"></b-input>
+            <b-input style="width: 60px;" required controls-position="compact" type="is-light" v-model="input.unity"></b-input>
           </b-field>
 
           <b-field label="Quantité">
             <b-numberinput
             controls-position="compact"
             type="is-dark"
-            v-model="input.product_quantity"
+            v-model.number="input.quantity"
             min="1"
             :max="(!isPurchase && productData) ? productData.quantity : 9999999"
             required></b-numberinput>
           </b-field>
 
           <b-field label="Prix d'unité (DA)">
-            <b-input style="width: 120px;" v-model="input.unity_price" required></b-input>
+            <b-input style="width: 120px;" v-model.number="input.unity_price" required></b-input>
           </b-field>
 
 			<b-field label="Montant (DA)">
-	            <b-input style="width: 120px;" controls-position="compact" type="is-light" v-model="input.product_amount" disabled></b-input>
+	            <b-input style="width: 120px;" controls-position="compact" type="is-light" v-model.number="input.amount" disabled></b-input>
 	         </b-field>
 
           <b-field v-if="isEdit" label=" ‎">
@@ -141,7 +141,7 @@ import {ipcRenderer} from 'electron';
 			setProductData() {
 				this.productCategories.some((pc) => {
 					return pc.Products.some((p) => {
-						if (p.dataValues.ID == this.input.ProductID)
+						if (p.dataValues.id == this.input.ProductId)
 							return this.productData = p.dataValues;
 					})
 				})
@@ -168,21 +168,21 @@ import {ipcRenderer} from 'electron';
 			
 		},
 		watch: {
-			'input.ProductID': {
+			'input.ProductId': {
 				handler: function(newID, before) {
 					
 				},
 				deep: true
 			},
-			'input.product_quantity': {
+			'input.quantity': {
 				handler: function(after, before) {
-					this.input.product_amount = Number(this.input.unity_price) * Number(after);
+					this.input.amount = Number(this.input.unity_price) * Number(after);
 				},
 				deep: true
 			},
 			'input.unity_price': {
 				handler: function(after, before) {
-					this.input.product_amount = Number(after) * Number(this.input.product_quantity);
+					this.input.amount = Number(after) * Number(this.input.quantity);
 				},
 				deep: true
 			},
@@ -191,7 +191,7 @@ import {ipcRenderer} from 'electron';
 				handler: function(after, before) {
 					if (after) {
 						this.isLoading = false;
-						if (this.input.ProductID)
+						if (this.input.ProductId)
 							this.setProductData()
 					}
 				}

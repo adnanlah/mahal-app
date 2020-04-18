@@ -69,7 +69,7 @@
                 </b-field>
               </b-field>
               <b-field label="Apercu">
-                <img :message="logoMessage" v-if="companyData.logo" :src="companyData.logo" alt="Pas de logo">
+                <img :message="logoMessage" v-if="companyData.base64" :src="companyData.base64" alt="Pas de logo">
               </b-field>
 
             </div>
@@ -98,6 +98,7 @@ export default {
       companyData: {
         imageFile: null,
         image_path: '',
+        base64: ''
       },
       isLoading: false,
       logoMessage: ''
@@ -136,7 +137,7 @@ export default {
         this.message = '';
         let fileReader = new FileReader();
         fileReader.onload = (fileLoadedEvent) => {
-          this.companyData.logo = fileLoadedEvent.target.result;
+          this.companyData.base64 = fileLoadedEvent.target.result;
         }
         fileReader.readAsDataURL(this.companyData.imageFile);
       }

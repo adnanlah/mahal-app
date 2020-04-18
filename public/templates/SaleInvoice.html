@@ -2,92 +2,162 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Document</title>
+	<title>Sale Invoice</title>
+	<style>
+		body {
+			padding: 20px;
+			font-size: 22px;
+		}
+		header, .base-info, .columns {
+			display: flex;
+			justify-content: space-between;
+		}
+		h3.title {
+			margin: 0;
+		}
+		.account {
+			display: flex;
+
+		}
+		.base-info > div {
+			width: 40%;
+		}
+		.doit {
+			width: 100px;
+		}
+		.company {
+			border-top: 1px solid #000;
+			border-bottom: 1px solid #000;
+			margin: 10px 0;
+			padding: 10px 0;
+		}
+		table {
+			border-spacing: 0;
+			border-collapse: collapse;
+			margin-bottom: 15px;
+		}
+		table.lines-table {
+			width: 100%;
+		}
+		table.lines-table th, table.lines-table td {
+			border: 1px solid #000;
+			text-align: center;
+			padding: 3px;
+		}
+		table.total * {
+			padding: 3px 15px;
+			border: 1px solid #000;
+		}
+		footer {
+			text-align: center;
+		}
+	</style>
 </head>
 <body>
 	<header>
 		<div>
-			ETS DJOUDI BOUAZA INSTALATEUR GPL/C <br>
-			RC: 17/00-1547366A17 - NIF: 194380101183182 - AI: 17012013869 <br>
-			NIS: 1 994 3801 01183 34 - Cpte Bancaire BNA: 00100654030000153587 <br>
+			<h3 class="title">{{company.name}}</h3>
+			<div>{{company.desciption}} {{company.city}}</div>
+			<div class="info">
+				{{company.address}} <br>
+				Tél: {{company.phone}}. Fax {{company.fax}} <br>
+				Capital: {{company.cap}}
+			</div>
 		</div>
-		<div>
-			<div class="left">
-				Date: 02-01-2019 <br>
-				Facture N: 02/2019
-			</div>
-			<div class="right">
-				<div>
-					Doit
-				</div>
-				<div>
-					<h3>DIFLI ADIL</h3>
-					<h4>LEGROS BISKERA</h4>
-				</div>
-			</div>
-		</div>		
+		<div class="logo">
+			<img src="{{{company.logo64}}}" alt="" />
+		</div>
+				
 	</header>
 	<main>
-		<table>
+		<div class="company">
+			RC: {{company.rc}} - NIF: {{company.nif}} - AI: {{company.ai}} <br>
+			NIS: {{company.nis}} - Cpte Bancaire BNA: {{company.bank_account}} <br>
+		</div>
+		<div class="base-info">
+			<div class="account">
+				<div class="doit">
+					Doit a:
+				</div>
+				<div class="column">
+					<b>Nom: </b>{{invoice.Supplier.dataValues.name}} <br>
+					<b>Adresse: </b>{{invoice.Supplier.dataValues.name}} <br>
+					<b>NRC: </b>{{invoice.Supplier.dataValues.name}} <br>
+					<b>Art Imp: </b>{{invoice.Supplier.dataValues.name}} <br>
+					<b>Id Fisc: </b>{{invoice.Supplier.dataValues.name}} <br>
+				</div>
+			</div>
+			<div class="invoice-info">
+				<div>
+					<h3 class="title">Facture N: 123/2020</h3>
+					Date: {{invoice.dataValues.date}} <br>
+				</div>
+			</div>
+		</div>
+		<table class="lines-table">
 			<thead>
 				<tr>
-					<th>Item</th>
+					<th>N</th>
 					<th>Désignation</th>
+					<th>U.N</th>
 					<th>Qté</th>
 					<th>Prix H.T</th>
 					<th>Montant H.T</th>
 				</tr>
 			</thead>
 			<tbody>
+				{{#each invoice.Items}}
 				<tr>
-					<td>1</td>
-					<td>Conversion d'un vehicule au GPL Carburant</td>
-					<td>1</td>
-					<td>50458,72</td>
-					<td>50458,72</td>
+					<td>{{dataValues.ID}}</td>
+					<td>{{dataValues.designation}}</td>
+					<td>{{dataValues.product_unity}}</td>
+					<td>{{dataValues.product_quantity}}</td>
+					<td>{{dataValues.unity_price}}</td>
+					<td>{{dataValues.product_amount}}</td>
 				</tr>
-				<tr>
-					<td>1</td>
-					<td>Conversion d'un vehicule au GPL Carburant</td>
-					<td>1</td>
-					<td>50458,72</td>
-					<td>50458,72</td>
-				</tr>
+				{{/each}}
 			</tbody>
 		</table>
+		
+		<div class="columns">
+			<div>
+				<p>Réglement: CHEQUE_N ........ du 28-10-2018</p>
+				<p>Arrété la présente facture à la somme de: {{invoice.dataValues.ntp_text}}</p>
+			</div>
+			<table class="total">
+				<tr>
+					<td>Montant H.T</td>
+					<td>{{invoice.dataValues.pretax_amount}}</td>
+				</tr>
+				<tr>
+					<td>TVA de {{invoice.dataValues.tva_percentage}}(%)</td>
+					<td>{{invoice.dataValues.tva}}</td>
+				</tr>
+				<tr>
+					<td>Montant T.T.C</td>
+					<td>{{invoice.dataValues.ttc}}</td>
+				</tr>
+				<tr>
+					<td>Drois de timbres</td>
+					<td>{{invoice.dataValues.timbres}}</td>
+				</tr>
+				<tr>
+					<td>Remise</td>
+					<td>{{invoice.dataValues.remise}}</td>
+				</tr>
+				<tr style="font-weight: 800">
+					<td>NET A PAYER</td>
+					<td>{{invoice.dataValues.ntp}}</td>
+				</tr>
+			</table>
 
-		<table>
-			<tr>
-				<td>Montant</td>
-				<td>50 458,72</td>
-			</tr>
-			<tr>
-				<td>TVA 09%</td>
-				<td>4541,28</td>
-			</tr>
-			<tr>
-				<td>Montant T.T.C</td>
-				<td>55000,00</td>
-			</tr>
-			<tr>
-				<td>Drois de timbres</td>
-				<td>550,00</td>
-			</tr>
-			<tr>
-				<td>NET A PAYER</td>
-				<td>55550,00</td>
-			</tr>
-		</table>
-		<p>
-			Arreter la présente facture à la somme de: ciquante
-		</p>
-		<div>
-			Mode de paiement: par especes
 		</div>
 	</main>
 	<footer>
-		CITE BOUTRIFIS
-		TEL: 027 91 38 06
+		
+		<p>
+			MERCI DE NOUS AVOIR CHOISI
+		</p>
 	</footer>
 </body>
 </html>

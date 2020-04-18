@@ -25,7 +25,7 @@
                   <b-input
                       v-model="productData.description"
                       placeholder="P012569"
-                      required>
+                      >
                   </b-input>
               </b-field>
               <b-field label="La marque">
@@ -39,20 +39,7 @@
                 <b-input v-model.number="productData.selling_price" required>
                   </b-input>
               </b-field>
-              <b-field label="Ajouter une image">
-                <b-field class="file">
-                    <b-upload v-model="productData.imageFile" @input="onFileChange">
-                        <a class="button is-link">
-                            <b-icon icon="upload"></b-icon>
-                            <span>Upload</span>
-                        </a>
-                    </b-upload>
-                    <b-button type="is-danger" icon-right="autorenew" @click="productData.imageFile = null"/>
-                    <span class="file-name" v-if="productData.imageFile">
-                        {{ productData.imageFile.name }}
-                    </span>
-                </b-field>
-              </b-field>
+              
               <b-field v-if="isUpdate" label="Prix d'achat moyen">
                   <b-input disabled v-model.number="productData.average_purchase_price" required>
                   </b-input>
@@ -70,8 +57,8 @@
 
               <b-field label="Choisi la categorie">
                 <b-field>
-                  <b-select placeholder="Categorie" expanded required v-model="productData.ProductCategoryID">
-                    <option v-for="(pc, idx) in productCategories" :key="idx" :value="pc.ID">{{pc.name}}</option>
+                  <b-select placeholder="Categorie" expanded required v-model="productData.ProductCategoryId">
+                    <option v-for="(pc, idx) in productCategories" :key="idx" :value="pc.id">{{pc.name}}</option>
                   </b-select>
                   <p class="control">
                     <b-button class="button is-success" icon-left="plus" @click="activeNew"></b-button>
@@ -110,12 +97,24 @@
                   </p>
                 </b-field>
               </b-field>
+              <b-field label="Image" :message="imageMessage">
+                <b-field class="file">
+                  <b-upload v-model="productData.image.imageFile" @input="onFileChange">
+                      <a class="button is-link">
+                          <b-icon icon="upload"></b-icon>
+                          <span>Upload</span>
+                      </a>
+                  </b-upload>
+                  <b-button type="is-danger" icon-right="autorenew" @click="productData.image.imageFile = null"/>
+                  <span class="file-name" v-if="productData.image.imageFile">
+                      {{ productData.image.imageFile.name }}
+                  </span>
+                </b-field>
+              </b-field>
+              <div class="image" v-if="productData.image.base64">
+                <img :src="productData.image.base64" alt="Pas d'image">
+              </div>
 
-              <div v-if="message">{{message}}</div>
-
-            <div class="image" v-if="productData.image_path">
-              <img :src="productData.image_path" alt="Pas d'image">
-            </div>
           </div> <!-- end of div.form -->
           </section>
           <footer class="modal-card-foot">
@@ -149,25 +148,27 @@ import {ipcRenderer} from 'electron';
       return {
         productData: {
           name: '',
-          ID: '',
+          id: '',
           description: '',
           selling_price: 0,
-          ProductCategoryID: '',
-          imageFile: null,
-          image_path: '',
+          ProductCategoryId: '',
+          image: {
+            imageFile: null,
+            base64: '',
+          }
         },
         newCategoryData: {
           name: ''
         },
         updateCategoryData: {
-          ID: '',
+          id: '',
           name: ''
         },
         nextID: '',
         isLoading: true,
         showNewCat: false,
         showUpdateCat: false,
-        message: ''
+        imageMessage: ''
       }
     },
     computed: {
@@ -177,12 +178,9 @@ import {ipcRenderer} from 'electron';
       isUpdate() {
         return this.data ? true : false;
       },
-      dirDocFiles() {
-        return this.$store.getters.CONFIG.dirDocFiles;
-      },
       formattedID() {
         if (this.isUpdate) 
-          return this.pad(this.productData.ID, 4)
+          return this.pad(this.productData.id, 4)
         else
           return this.pad(this.nextID, 4)
       }
@@ -190,24 +188,27 @@ import {ipcRenderer} from 'electron';
     watch: {
       showUpdateCat: function (newValue) {
         if (newValue) {
-          if (this.productData.ProductCategoryID > 0) {
-            this.updateCategoryData.ID = this.productData.ProductCategoryID;
-            this.updateCategoryData.name = this.productCategories.filter(pc => pc.ID == this.productData.ProductCategoryID)[0].name;
+          if (this.productData.ProductCategoryId > 0) {
+            this.updateCategoryData.id = this.productData.ProductCategoryId;
+            this.updateCategoryData.name = this.productCategories.filter(pc => pc.id == this.productData.ProductCategoryId)[0].name;
           } else {
             this.showUpdateCat = false;
-            this.message = 'SVP! Choisi une categorie'
           }
 
         }
       },
-      'productData.ProductCategoryID': function(newValue) {
+      'productData.ProductCategoryId': function(newValue) {
         if (newValue > 0)
           this.message = '';
       },
     },
     mounted() {
       if (this.data) {
-        this.productData = this.data;
+        for (let key in this.data) {
+          if (key !== 'Image' && this.data[key])
+            this.productData[key] = this.data[key];
+        }
+        this.productData.image.base64 = this.data.Image.dataValues.base64;
       }
       if (!this.isUpdate) {
         ipcRenderer.send('get_next_product_id')
@@ -217,20 +218,30 @@ import {ipcRenderer} from 'electron';
       }
     },
     methods: {
+      onFileChange(e) {
+        if (this.productData.image.imageFile.type != 'image/jpeg' && this.productData.image.imageFile.type != 'image/png') {
+          this.productData.image.imageFile = null;
+          this.imageMessage = 'Le fichier doit etre une image (PNG ou Jpeg)'
+        } else {
+          this.imageMessage = '';
+          let fileReader = new FileReader();
+          fileReader.onload = (fileLoadedEvent) => {
+            this.productData.image.base64 = fileLoadedEvent.target.result;
+          }
+          fileReader.readAsDataURL(this.productData.image.imageFile);
+        }
+      },
       pad(n, size) {
         let s = String(n);
         while (s.length < (size || 2)) {s = "0" + s;}
         return s;
       },
-      onFileChange(e) {
-        this.productData.image_path = this.productData.imageFile.path;
-      },
       activateUpdate() {
-        if (this.productData.ProductCategoryID > 0) {
+        if (this.productData.ProductCategoryId > 0) {
           this.showNewCat = false;
           this.showUpdateCat = true;
-          this.updateCategoryData.ID = this.productData.ProductCategoryID;
-          this.updateCategoryData.name =this.productCategories.filter(pc => pc.ID == this.productData.ProductCategoryID)[0].name;
+          this.updateCategoryData.id = this.productData.ProductCategoryId;
+          this.updateCategoryData.name =this.productCategories.filter(pc => pc.id == this.productData.ProductCategoryId)[0].name;
         } else {
           this.showUpdateCat = false;
           this.showNewCat = false;
@@ -278,7 +289,7 @@ import {ipcRenderer} from 'electron';
         })
       },
       onDeleteProd() {
-        ipcRenderer.send('delete_product', this.productData.ID);
+        ipcRenderer.send('delete_product', this.productData.id);
         ipcRenderer.on('product_deleted', (event, response) => {
           this.isLoading = false;
           if (response.status)
@@ -294,7 +305,7 @@ import {ipcRenderer} from 'electron';
         this.$store.dispatch("SAVE_CATEGORY", this.newCategoryData)
           .then((newPC) => {
             this.showNewCat = false;
-            this.productData.ProductCategoryID = newPC.ID;
+            this.productData.ProductCategoryId = newPC.id;
               this.$buefy.toast.open({
                   message: 'Categorie bien ajouté!',
                   type: 'is-success'
@@ -328,9 +339,9 @@ import {ipcRenderer} from 'electron';
           })
       },
       onDeleteCat() {
-        this.$store.dispatch("DELETE_CATEGORY", this.productData.ProductCategoryID)
+        this.$store.dispatch("DELETE_CATEGORY", this.productData.ProductCategoryId)
         .then(() => {
-            this.productData.ProductCategoryID = null;
+            this.productData.ProductCategoryId = null;
               this.$buefy.toast.open({
                   message: 'Categorie bien supprimé!',
                   type: 'is-success'

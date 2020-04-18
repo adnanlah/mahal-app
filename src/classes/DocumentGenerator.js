@@ -1,8 +1,6 @@
 const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
-// const merge = require(path.join(__dirname, '/../../app.asar.unpacked/node_modules/easy-pdf-merge'));
-const merge = require('easy-pdf-merge');
 const Handlebars = require('handlebars');
 const util = require('util');
 const moment = require('moment');
@@ -18,21 +16,6 @@ Handlebars.registerHelper('getYear', function(passedString) {
     return new Handlebars.SafeString(theString)
 });
 
-function mergeMultipleFiles(filePaths, outputName) {
-	return new Promise((resolve, reject) => {
-		merge(filePaths, outputName, function (err) {
-			if (err) {
-				console.log(err);
-				reject(err);
-			}
-			filePaths.forEach((fileName) => {
-				fs.unlinkSync(fileName);
-			})
-			resolve();
-		})
-	})
-}
-
 class DocumentGenerator {
 	constructor(dirDocFiles, documentsDir, company) {
 		this.company = company ? company : {name: 'ETS', address: 'Bouter'};
@@ -42,8 +25,8 @@ class DocumentGenerator {
 	async html(invoice, documentType) {
 		try {
 			// console.log('__dirname', __dirname)
-			// let templatepath = path.resolve(`${this.dirDocFiles}/../assets/templates/${documentType}.html`);
-			let templatepath = path.resolve(`${this.documentsDir}/templates/${documentType}.html`);
+			// let templatepath = path.resolve(`${this.documentsDir}/templates/${documentType}.html`);
+			let templatepath = path.resolve(`${__static}/templates/${documentType}.html`);
 			const content = await readFile(templatepath, 'utf8');
 			const template = Handlebars.compile(content);
 			return template({invoice, company: this.company});
@@ -73,36 +56,25 @@ class DocumentGenerator {
 				ignoreDefaultArgs: ['--disable-extensions']
 			});
 			const page = await browser.newPage();
-			const date = moment().format('YYYY-MM-DDTHH.mm.ss');
-			let filePaths = [];
+			const printedAt = moment().format('DD-MM-YYYY HH.mm.ss');
 			let finalFilePath;
 
-			for (let i = 0; i < datasArray.length; i++) {
-				console.log('data.date', datasArray[i].date)
-				datasArray[i].formattedDate = moment(datasArray[i].date).format('DD-MM-YYYY');
-				datasArray[i].printedAt = moment().format('DD-MM-YYYYTHH.mm.ss')
-				const outputName = `${documentType} document ${date} N${i}`;
-				let html = await this.html(datasArray[i], documentType);
-				let filePath = path.join(this.dirDocFiles, `/documents/${outputName}.pdf`);
-				let options = {
-					path: filePath,
-					format: 'A4'
-				};
-				await page.setContent(html);
-				await page.pdf(options);
-				filePaths.push(filePath);
-			}
-
-			if (filePaths.length > 1) {
-				finalFilePath = path.join(this.dirDocFiles, `/documents/${documentType} document ${date}`);
-				await mergeMultipleFiles(filePaths, finalFilePath);
-			} else {
-				finalFilePath = filePaths[0];
-			}
-			
+			// datasArray[i].formattedDate = moment(datasArray[i].date).format('DD-MM-YYYY');
+			// datasArray[i].printedAt = moment().format('DD-MM-YYYYTHH.mm.ss')
+			const outputName = `${documentType} document ${printedAt}`;
+			let html = await this.html(datasArray[0], documentType);
+			let filePath = path.join(this.dirDocFiles, `/documents/${outputName}.pdf`);
+			let options = {
+				// path: filePath,
+				format: 'A4'
+			};
+			await page.setContent(html);
+			let returned = await page.pdf(options);
+			console.log('returned', returned)
+			console.log('typeof returned', typeof returned)
 			await browser.close();
 					
-			return finalFilePath;
+			return returned;
 		} catch(e) {
 			console.log(e);
 			throw e;

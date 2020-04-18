@@ -3,12 +3,11 @@ module.exports = {
 	    electronBuilder: {
 			builderOptions: {
 				"extraFiles": {
-					"from":"src/migrations",
-					"to":"./migrations/"
+					"from":"src/assets",
+					"to":"./assets/"
 				},
-				nodeIntegration: true,
-      			externals: ['umzug']
-			}
+			},
+			externals: ['umzug']
 	    }
 	},
 	"transpileDependencies": [

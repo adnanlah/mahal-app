@@ -62,7 +62,6 @@ module.exports = [
       nis: Sequelize.STRING,
       cap: Sequelize.STRING,
       bank_account: Sequelize.STRING,
-      logo: Sequelize.STRING,
       createdAt: {
         allowNull: false,
         type: Sequelize.STRING
@@ -78,9 +77,9 @@ module.exports = [
   }
 },
 {
-  name: '20200413022202-create-table-recettes',
+  name: '20200413022202-create-table-transactions',
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Recettes', {
+    return queryInterface.createTable('Transactions', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -90,9 +89,10 @@ module.exports = [
       amount: Sequelize.FLOAT,
       amount_text: Sequelize.STRING,
       motive: Sequelize.STRING,
-      client_name: Sequelize.STRING,
-      client_info: Sequelize.STRING,
+      account_name: Sequelize.STRING,
+      account_info: Sequelize.STRING,
       date: Sequelize.STRING,
+      type: Sequelize.STRING,
       createdAt: {
         allowNull: false,
         type: Sequelize.STRING
@@ -104,25 +104,22 @@ module.exports = [
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Recettes');
+    return queryInterface.dropTable('Transactions');
   }
 },
 {
-  name: '20200413022203-create-table-depenses',
+  name: '20200413022207-create-table-depensedesignations',
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Depenses', {
+    return queryInterface.createTable('DepenseDesignations', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      amount: Sequelize.FLOAT,
-      amount_text: Sequelize.STRING,
-      designation: Sequelize.STRING,
-      account: Sequelize.STRING,
-      account_info: Sequelize.STRING,
-      date: Sequelize.STRING,
+      name: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.STRING
@@ -134,7 +131,34 @@ module.exports = [
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Depenses');
+    return queryInterface.dropTable('DepenseDesignations');
+  }
+},
+{
+  name: '20200413022207-create-table-recettemotives',
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.createTable('RecetteMotives', {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER
+      },
+      name: {
+        type: Sequelize.STRING
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.STRING
+      }
+    });
+  },
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.dropTable('RecetteMotives');
   }
 },
 {
@@ -148,9 +172,8 @@ module.exports = [
         type: Sequelize.INTEGER
       },
       username: Sequelize.STRING,
-      text: Sequelize.STRING,
-      date: Sequelize.STRING,
-      type: Sequelize.BOOLEAN,
+      log: Sequelize.STRING,
+      status: Sequelize.BOOLEAN,
       createdAt: {
         allowNull: false,
         type: Sequelize.STRING
@@ -220,9 +243,6 @@ module.exports = [
       selling_price: {
         type: Sequelize.FLOAT
       },
-      image_path: {
-        type: Sequelize.STRING
-      },
       sum_purchase_price: {
         type: Sequelize.FLOAT,
         allowNull: false,
@@ -255,6 +275,33 @@ module.exports = [
   },
   down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('Products');
+  }
+},
+{
+  name: '20200413022221-create-table-images',
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.createTable('Images', {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER
+      },
+      base64: {
+        type: Sequelize.STRING
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.STRING
+      }
+    });
+  },
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.dropTable('Images');
   }
 },
 {
@@ -551,6 +598,36 @@ module.exports = [
     .then(() => {
       return queryInterface.addColumn(
         'Products',
+        'ImageId',
+        {
+          type: Sequelize.INTEGER,
+          references: {
+            model: 'Images',
+            key: 'id',
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'SET NULL',
+        }
+      )
+    })
+    .then(() => {
+      return queryInterface.addColumn(
+        'Companies',
+        'ImageId',
+        {
+          type: Sequelize.INTEGER,
+          references: {
+            model: 'Images',
+            key: 'id',
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'SET NULL',
+        }
+      )
+    })
+    .then(() => {
+      return queryInterface.addColumn(
+        'Products',
         'ProductCategoryId',
         {
           type: Sequelize.INTEGER,
@@ -649,6 +726,20 @@ module.exports = [
       return queryInterface.removeColumn(
         'Products',
         'ProductCategoryId',
+      );
+    })
+    .then(() => {
+      // remove Payment hasOne Order
+      return queryInterface.removeColumn(
+        'Products',
+        'ImageId',
+      );
+    })
+    .then(() => {
+      // remove Payment hasOne Order
+      return queryInterface.removeColumn(
+        'Companies',
+        'ImageId',
       );
     })
     .then(() => {
