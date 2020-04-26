@@ -177,6 +177,18 @@ export default {
 </script>
 
 <style lang="scss">
+@media print
+{    
+  * {
+    display: none !important;
+  }
+  canvas {
+    display: inline;
+    border: 1px solid black;
+    page-break-after: always;
+  }
+}
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

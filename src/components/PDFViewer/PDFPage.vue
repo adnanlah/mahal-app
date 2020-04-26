@@ -1,6 +1,34 @@
 <script>
+import debug from 'debug';
+// const log = debug('app:components/PDFPage');
+
+import {PIXEL_RATIO} from '@/utils/constants';
+
 export default {
-  props: ['page', 'scale'],
+  name: 'PDFPage',
+
+  props: {
+    page: {
+      type: Object, // instance of PDFPageProxy returned from pdf.getPage
+      required: true,
+    },
+    scale: {
+      type: Number,
+      required: true,
+    },
+    isPageFocused: {
+      type: Boolean,
+      default: false,
+    },
+    isElementVisible: {
+      type: Boolean,
+      default: false,
+    },
+    isElementFocused: {
+      type: Boolean,
+      default: false,
+    },
+  },
 
   computed: {
     actualSizeViewport() {
@@ -9,22 +37,21 @@ export default {
 
     canvasStyle() {
       const {width: actualSizeWidth, height: actualSizeHeight} = this.actualSizeViewport;
-      const pixelRatio = window.devicePixelRatio || 1;
-      const [pixelWidth, pixelHeight] = [actualSizeWidth, actualSizeHeight].map(dim => Math.ceil(dim / pixelRatio));
-      return `width: ${pixelWidth}px; height: ${pixelHeight}px;`
+      const [pixelWidth, pixelHeight] = [actualSizeWidth, actualSizeHeight]
+        .map(dim => Math.ceil(dim / PIXEL_RATIO));
+      return `width: ${pixelWidth}px; height: ${pixelHeight}px;`;
     },
 
     canvasAttrs() {
       let {width, height} = this.viewport;
       [width, height] = [width, height].map(dim => Math.ceil(dim));
-
       const style = this.canvasStyle;
 
       return {
         width,
         height,
         style,
-        class: 'pdf-page',
+        class: 'pdf-page box-shadow',
       };
     },
 
@@ -34,38 +61,76 @@ export default {
   },
 
   methods: {
-    renderPage() {
+    focusPage() {
+      if (this.isPageFocused) return;
+
+      this.$emit('page-focus', this.pageNumber);
+    },
+
+    drawPage() {
+      console.log('drawing the  page')
+      if (this.renderTask) return;
+
+      const {viewport} = this;
+      const canvasContext = this.$el.getContext('2d');
+      const renderContext = {canvasContext, viewport};
+
       // PDFPageProxy#render
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
-      this.renderTask = this.page.render(this.getRenderContext());
-      this.renderTask.
-        then(() => this.$emit('rendered', this.page)).
-        then(() => console.log(`Page ${this.pageNumber} rendered`));
+      this.renderTask = this.page.render(renderContext);
+      this.renderTask
+        .then(() => {
+          this.$emit('page-rendered', {
+            page: this.page,
+            text: `Rendered page ${this.pageNumber}`,
+          });
+         })
+        .catch(response => {
+          this.destroyRenderTask();
+          this.$emit('page-errored', {
+            response,
+            page: this.page,
+            text: `Failed to render page ${this.pageNumber}`,
+          });
+        });
+    },
+
+    updateVisibility() {
+      this.$parent.$emit('update-visibility');
     },
 
     destroyPage(page) {
-      if (!page) return;
-
       // PDFPageProxy#_destroy
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
-      page._destroy();
+      if (page) page._destroy();
+
+      this.destroyRenderTask();
+    },
+
+    destroyRenderTask() {
+      if (!this.renderTask) return;
 
       // RenderTask#cancel
       // https://mozilla.github.io/pdf.js/api/draft/RenderTask.html
-      if (this.renderTask) this.renderTask.cancel();
-    },
-
-    getRenderContext() {
-      const {viewport} = this;
-      const canvasContext = this.$el.getContext('2d');
-
-      return {canvasContext, viewport};
+      this.renderTask.cancel();
+      delete this.renderTask;
     },
   },
 
   watch: {
-    page(page, oldPage) {
+    scale: 'updateVisibility',
+
+    page(_newPage, oldPage) {
       this.destroyPage(oldPage);
+    },
+
+    isElementFocused(isElementFocused) {
+      if (isElementFocused) this.focusPage();
+    },
+
+    isElementVisible(isElementVisible) {
+      // if (isElementVisible) this.drawPage();
+      console.log('isElementVisible', isElementVisible)
     },
   },
 
@@ -77,7 +142,7 @@ export default {
 
   mounted() {
     console.log(`Page ${this.pageNumber} mounted`);
-    this.renderPage();
+    this.drawPage();
   },
 
   beforeDestroy() {
@@ -93,6 +158,6 @@ export default {
 <style>
 .pdf-page {
   display: block;
-  margin: 0 auto 0.5em;
+  margin: 0 auto;
 }
 </style>

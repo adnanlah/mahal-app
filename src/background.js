@@ -7,9 +7,9 @@ import path from 'path'
 import Umzug from 'umzug'
 import fs from 'fs'
 // import fse from 'fs-extra'
-import DocumentGenerator from './classes/DocumentGenerator.js'
-import migrationsList from './classes/MigrationsList.js'
-import {getParams} from './classes/HelperFunctions.js'
+import DocumentGenerator from './utils/DocumentGenerator.js'
+import migrationsList from './utils/MigrationsList.js'
+import {getParams} from './utils/HelperFunctions.js'
 
 const dbs = require('./models').default;
 let {sequelize, Sequelize} = dbs;
@@ -229,15 +229,16 @@ ipcMain.on('create_invoice', function (event, data) {
   //   else 
   //     return null;
   // })
-  .then((pdf) => {
-    console.log('pdf' ,pdf)
-    console.log('typeof pdf' ,typeof pdf)
+  .then((pdfFile) => {
+    console.log('pdf' ,pdfFile)
+    console.log('typeof pdf' ,typeof pdfFile)
+    return event.sender.send('invoice_created', {status: true, message: `Facture bien ajouté!`, pdfFile});
+    
+  })
+  .then(() => {
     return dbs.Log.create({
       message: 'Facture a été bien crée.'
     })
-  })
-  .then(() => {
-    return event.sender.send('invoice_created', {status: true, message: `Facture bien ajouté!`});
   })
   .catch(function (e) {
     console.log('Transaction has been rolled back: ', e)

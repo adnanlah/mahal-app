@@ -15,7 +15,7 @@ const getters = {
 		return state.accounts ? state.accounts.filter(a => a.type == 'supplier') : [];
 	},
 	NEXT_ID: state => {
-		return state.accounts.length ? Math.max(...state.accounts.map(acc => acc.id)) + 1 : 1;
+		return state.accounts ? Math.max(...state.accounts.map(acc => acc.id)) + 1 : 1;
 	}
 }
 

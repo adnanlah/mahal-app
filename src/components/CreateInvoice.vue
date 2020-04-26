@@ -293,6 +293,14 @@
         aria-modal>
         <AccountModalForm :type="isPurchase ? 'supplier' : 'client'"></AccountModalForm>
       </b-modal>
+      <b-modal :active.sync="isPDFViewerModalActive"
+        has-modal-card
+        full-screen
+        trap-focus
+        aria-role="dialog"
+        aria-modal>
+        <PDFViewer v-bind="{pdfFile}"></PDFViewer>
+      </b-modal>
     </div>
 </template>
 
@@ -301,6 +309,7 @@
 import {ipcRenderer} from 'electron';
 import InvoiceItem from '@/components/InvoiceItem.vue'
 import AccountModalForm from '@/components/AccountModalForm';
+import PDFViewer from '@/components/PDFViewer/PDFViewer';
 import numberToText from '@/assets/js/numberToText';
 
 class Invoice {
@@ -357,7 +366,8 @@ export default {
   name: 'CreateInvoice',
   components: {
     InvoiceItem,
-    AccountModalForm
+    AccountModalForm,
+    PDFViewer
   },
   props: {
     modelName: {
@@ -403,6 +413,8 @@ export default {
       previewImagePath: '',
       forcedUpdate: null,
       isAccountModalActive: false,
+      isPDFViewerModalActive: false,
+      pdfFile: null,
       withoutSupplier: false,
       inputColumns: [
         {
@@ -583,7 +595,7 @@ export default {
         this.previewImagePath = path;
     },
     resetInvoice(data = null) {
-      this.invoice = new Invoice();
+      this.invoice.invoiceData = new Invoice();
       this.invoice.payments = [new Payment()];
       this.invoice.inputs = [];
     },
@@ -645,6 +657,15 @@ export default {
     },
     resetInput() {
       this.input = this.invoice.inputs[this.rowIndex];
+    },
+    openPDFViewer(pdfFile) {
+      console.log('openPDFViewer', pdfFile)
+      this.isPDFViewerModalActive = true;
+      this.pdfFile = pdfFile;
+    },
+    closedPDFViewer() {
+      this.isPDFViewerModalActive = false;
+      this.pdfFile = null;
     }
   },
   mounted() {
@@ -669,10 +690,11 @@ export default {
 
     ipcRenderer.on('invoice_created', (event, r) => {
       this.isLoading = false;
-      console.log('invoice_created')
+      console.log('invoice_created', r.pdfFile)
       if (r.status) {
         this.successToast(r.message)
-        this.resetInvoice();
+        // this.resetInvoice();
+        this.openPDFViewer(r.pdfFile);
       } else {
         this.failToast(r.message)
       }
