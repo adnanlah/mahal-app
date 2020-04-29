@@ -240,7 +240,38 @@
             </div> <!-- End of .columns -->
           </section>
 
-          <div>
+          <footer :class="{'modal-card-foot': isModal}">
+            <template v-if="isModal && isUpdate" >
+              <button class="button" type="button" @click="$parent.close();">Fermer</button>
+              <button @click="newCopy"
+                type="is-light">
+                  <b-icon icon="copy"></b-icon>
+                  Créer une copie 
+              </button>
+              <button
+                  type="is-dark"
+                  @click="print">
+                Imprimer
+              </button>
+              <button
+                  type="is-danger"
+                  icon-left="delete"
+                  @click="deleteInvoice">
+                Supprimer
+              </button>
+              <button type="submit" class="button is-primary">
+                Modifier
+              </button>
+              <b-dropdown aria-role="list" v-if="transferList" @change="transferTo">
+                  <button class="button is-dark" slot="trigger">
+                      <span>Transferer vers</span>
+                      <b-icon icon="menu-down"></b-icon>
+                  </button>
+
+                  <b-dropdown-item v-for="(transferItem, idx) in transferList" aria-role="listitem" :value="transferItem" :key="idx">{{transferItem}}</b-dropdown-item>
+              </b-dropdown>
+            </template>
+            <template v-else>
               <b-button
                 type="is-warning"
                 @click="resetInvoice">
@@ -252,37 +283,7 @@
               <button type="submit" class="button is-success" >
                 Enregistrer
               </button>
-          </div>
-          
-          <footer v-if="isModal && isUpdate" class="modal-card-foot">
-                <button class="button" type="button" @click="$parent.close();">Fermer</button>
-                <button @click="newCopy"
-                  type="is-light">
-                    <b-icon icon="copy"></b-icon>
-                    Créer une copie 
-                </button>
-                <button
-                    type="is-dark"
-                    @click="print">
-                  Imprimer
-                </button>
-                <button
-                    type="is-danger"
-                    icon-left="delete"
-                    @click="deleteInvoice">
-                  Supprimer
-                </button>
-                <button type="submit" class="button is-primary">
-                  Modifier
-                </button>
-                <b-dropdown aria-role="list" v-if="transferList" @change="transferTo">
-                    <button class="button is-dark" slot="trigger">
-                        <span>Transferer vers</span>
-                        <b-icon icon="menu-down"></b-icon>
-                    </button>
-
-                    <b-dropdown-item v-for="(transferItem, idx) in transferList" aria-role="listitem" :value="transferItem" :key="idx">{{transferItem}}</b-dropdown-item>
-                </b-dropdown>
+            </template>
           </footer>
         </div>
       </form>
@@ -293,14 +294,7 @@
         aria-modal>
         <AccountModalForm :type="isPurchase ? 'supplier' : 'client'"></AccountModalForm>
       </b-modal>
-      <b-modal :active.sync="isPDFViewerModalActive"
-        has-modal-card
-        full-screen
-        trap-focus
-        aria-role="dialog"
-        aria-modal>
-        <PDFViewer v-bind="{pdfFile}"></PDFViewer>
-      </b-modal>
+      
     </div>
 </template>
 
@@ -309,8 +303,8 @@
 import {ipcRenderer} from 'electron';
 import InvoiceItem from '@/components/InvoiceItem.vue'
 import AccountModalForm from '@/components/AccountModalForm';
-import PDFViewer from '@/components/PDFViewer/PDFViewer';
 import numberToText from '@/assets/js/numberToText';
+import { EventBus } from '@/utils/event-bus.js';
 
 class Invoice {
   constructor(invoice) {
@@ -358,7 +352,6 @@ class Payment {
     this.id = item ? item.id : null,
     this.number = item ? item.number : 0,
     this.amount = item ? item.amount : 0
-    this.date = item ? new Date(item.date) : new Date();
   }
 }
 
@@ -366,8 +359,7 @@ export default {
   name: 'CreateInvoice',
   components: {
     InvoiceItem,
-    AccountModalForm,
-    PDFViewer
+    AccountModalForm
   },
   props: {
     modelName: {
@@ -630,7 +622,7 @@ export default {
     },
     deleteInvoice() {
       ipcRenderer.send('delete_invoice', {
-        modelName: this.modelName,
+        modelName: this.realModelName,
         id: this.invoice.id
       })
     },
@@ -659,13 +651,10 @@ export default {
       this.input = this.invoice.inputs[this.rowIndex];
     },
     openPDFViewer(pdfFile) {
-      console.log('openPDFViewer', pdfFile)
-      this.isPDFViewerModalActive = true;
-      this.pdfFile = pdfFile;
+      this.$dispatch('open-pdf-viewer', pdfFile);
     },
-    closedPDFViewer() {
-      this.isPDFViewerModalActive = false;
-      this.pdfFile = null;
+    print() {
+      ipcRenderer.send('create-pdf', {data: [this.invoice.invoiceData], doc: this.realModelName})
     }
   },
   mounted() {
@@ -720,6 +709,13 @@ export default {
       // close modal
       this.$parent.close();
     })
+
+    ipcRenderer.on('pdf-created', (event, r) => {
+      if (r.status)
+        EventBus.$emit('open-pdf-viewer', r.pdfFile);
+      else
+        this.failToast(r.message)
+    });
   }
 };
 </script>

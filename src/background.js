@@ -23,15 +23,6 @@ if (!fs.existsSync(dataDir)){
     fs.mkdirSync(path.join(dataDir, '/productsimages'), { recursive: true });
 }
 let dg = new DocumentGenerator(dataDir, documentsDir);
-// let dg;
-
-// const umzug = new Umzug({
-//   migrations: Umzug.migrationsList(migrationsList, [sequelize.getQueryInterface(), Sequelize]),
-//   storage: 'sequelize',
-//   storageOptions: {
-//     sequelize: sequelize
-//   }
-// });
 
 const umzug = new Umzug({
   migrations: {
@@ -205,7 +196,11 @@ ipcMain.on('create_invoice', function (event, data) {
       })
       return Promise.all([invoice.setItems(products, { through: {}, individualHooks: true, transaction}), invoice]);
     })
-
+    .then(() => {
+      return dbs.Log.create({
+        message: 'Facture a été bien crée.'
+      })
+    })
   })
   .then((results) => {
     if (invoice.isPrinted) {
@@ -223,22 +218,10 @@ ipcMain.on('create_invoice', function (event, data) {
     else
       return null;
   })
-  // .then((openFile) => {
-  //   if (openFile)
-  //     shell.openItem(openFile);
-  //   else 
-  //     return null;
-  // })
   .then((pdfFile) => {
     console.log('pdf' ,pdfFile)
     console.log('typeof pdf' ,typeof pdfFile)
     return event.sender.send('invoice_created', {status: true, message: `Facture bien ajouté!`, pdfFile});
-    
-  })
-  .then(() => {
-    return dbs.Log.create({
-      message: 'Facture a été bien crée.'
-    })
   })
   .catch(function (e) {
     console.log('Transaction has been rolled back: ', e)
@@ -733,22 +716,10 @@ ipcMain.on('set_password', function (event, passData) {
   *** Print ***
 */
 
-ipcMain.on('print', function (event, data) {
-  dg.pdf(data.data, data.type)
-  .then((openFile) => {
-    if (openFile)
-      shell.openItem(openFile);
-    else 
-      return null;
+ipcMain.on('create-pdf', function (event, data) {
+  dg.pdf(data.data, data.doc)
+  .then((pdfFile) => {
+    event.sender.send('pdf-created', {status: true, pdfFile))
   })
-  .catch(e => event.sender.send('error', `Error imprimer ${e.message}`))
+  .catch(e => event.sender.send('pdf-created', {status: false, messaage: `Error imprimer ${e.message}`}))
 });
-
-/*
-  *** PRINT FUNCTION ***
-*/
-
-// returns a promise i think
-function print(data, doc) {
-  return dg.pdf(data, doc);
-}

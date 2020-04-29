@@ -57,7 +57,7 @@
 	<header>
 		<div>
 			<h3 class="title">{{company.name}}</h3>
-			<div>{{company.desciption}}</div>
+			<div>{{company.desciption}} {{company.city}}</div>
 			<div class="info">
 				{{company.address}} <br>
 				Tél: {{company.phone}}. Fax {{company.fax}} <br>
@@ -65,7 +65,7 @@
 			</div>
 		</div>
 		<div class="logo">
-			<img src="data:image/png;base64, {{company.logo64}}" alt="" />
+			<img src="{{{company.logo64}}}" alt="" />
 		</div>
 				
 	</header>

@@ -61,9 +61,6 @@
             <b-navbar-item tag="router-link" :to="{ path: '/logs' }">
                 HISTORIQUE
             </b-navbar-item>
-            <b-navbar-item tag="router-link" :to="{ path: '/testview' }">
-                PDF
-            </b-navbar-item>
 
         </template>
 
@@ -129,6 +126,15 @@
                  aria-modal>
             <About></About>
         </b-modal>
+        <b-modal :active.sync="isPDFViewerModalActive"
+          has-modal-card
+          @close="closedPDFViewer"
+          full-screen
+          trap-focus
+          aria-role="dialog"
+          aria-modal>
+          <PDFViewer v-bind="{pdfFile}"></PDFViewer>
+        </b-modal>
       </div>
     </main>
   </div>
@@ -139,13 +145,20 @@ import {ipcRenderer} from 'electron';
 import CompanyForm from '@/components/CompanyForm';
 import PasswordForm from '@/components/PasswordForm';
 import ConfigForm from '@/components/ConfigForm';
+import PDFViewer from '@/components/PDFViewer/PDFViewer';
 import About from '@/components/About';
+
+import { EventBus } from '@/utils/event-bus.js';
+
+EventBus.$on('open-pdf-file', pdfFile => {
+  this.pdfFile = pdfFile;
+  this.isPDFViewerModalActive = true;
+});
 
 ipcRenderer.on('overdue_invoices', (event, overdueInvoicesResult) => {
   if (overdueInvoicesResult.count > 0)
     this.overdueCount = overdueInvoicesResult.count;
 })
-
 
 export default {
   name: 'App',
@@ -163,7 +176,16 @@ export default {
     isCompanyModalActive: false,
     isPasswordModalActive: false,
     isAboutModalActive: false,
+    isPDFViewerModalActive: false,
+    pdfFile: null,
   }),
+
+  methods: {
+    closedPDFViewer() {
+      this.isPDFViewerModalActive = false;
+      this.pdfFile = null;
+    },
+  },
 
   mounted() {
     this.$store.dispatch('GET_INIT');
@@ -172,7 +194,7 @@ export default {
     ipcRenderer.on('error', (event, response) => {
       this.failToast(response.message)
     })
-  }
+  },
 };
 </script>
 

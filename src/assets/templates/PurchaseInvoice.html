@@ -6,7 +6,6 @@
 	<style>
 		body {
 			padding: 20px;
-			font-size: 22px;
 		}
 		header, .base-info, .columns {
 			display: flex;
@@ -59,13 +58,13 @@
 			<h3 class="title">{{company.name}}</h3>
 			<div>{{company.desciption}}</div>
 			<div class="info">
-				{{company.address}} <br>
+				{{company.address}} {{company.city}} <br>
 				Tél: {{company.phone}}. Fax {{company.fax}} <br>
 				Capital: {{company.cap}}
 			</div>
 		</div>
 		<div class="logo">
-			<img src="data:image/png;base64, {{company.logo64}}" alt="alternative" />
+			<img src="{{{company.logo}}}" alt="" />
 		</div>
 				
 	</header>
