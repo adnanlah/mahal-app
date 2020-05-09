@@ -87,6 +87,7 @@
 <script>
 import {ipcRenderer} from 'electron';
 import numberToText from '@/assets/js/numberToText';
+import { EventBus } from '@/utils/event-bus.js';
 
 export default {
   name: 'TransactionModalForm',
@@ -212,8 +213,14 @@ export default {
     },
 
     print() {
-      console.log('printing', this.transactionData)
       ipcRenderer.send('print', {data: [this.transactionData], type: 'receiptvoucher'});
+      ipcRenderer.on('pdf-created', (event, r) => {
+        if (r.status)
+          EventBus.$emit('open-pdf-viewer', r.pdfFile);
+        else
+          this.failToast(r.message)
+      });
+
     }
 
   }

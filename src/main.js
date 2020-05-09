@@ -9,10 +9,20 @@ Vue.use(Buefy)
 
 Vue.config.productionTip = false
 
-Vue.filter('da', function (value) {
+Vue.filter('DA', function (value) {
   if (!value) return ''
   value = value.toString()
   return value + ' DA'
+})
+
+Vue.filter('DD-MM-YYYY', function (value) {
+  if (!value) return ''
+  
+})
+
+Vue.filter('DD-MM-YYYY-HH-MM', function (value) {
+  if (!value) return ''
+  
 })
 
 Vue.mixin({

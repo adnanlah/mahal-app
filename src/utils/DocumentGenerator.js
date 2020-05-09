@@ -17,15 +17,13 @@ Handlebars.registerHelper('getYear', function(passedString) {
 });
 
 class DocumentGenerator {
-	constructor(dirDocFiles, documentsDir, company) {
+	constructor(dirDocFiles, company) {
 		this.company = company ? company : {name: 'ETS', address: 'Bouter'};
 		this.dirDocFiles = dirDocFiles;
-		this.documentsDir = documentsDir;
 	}
 	async html(invoice, documentType) {
 		try {
 			// console.log('__dirname', __dirname)
-			// let templatepath = path.resolve(`${this.documentsDir}/templates/${documentType}.html`);
 			let templatepath = path.resolve(`${__static}/templates/${documentType}.html`);
 			const content = await readFile(templatepath, 'utf8');
 			const template = Handlebars.compile(content);

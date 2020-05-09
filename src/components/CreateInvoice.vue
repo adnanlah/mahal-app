@@ -12,31 +12,20 @@
             <div v-if="!isDebt">
               <div class="invoice-items" >
                 <InvoiceItem
-                  :selected="selected"
-                  :isPurchase='isPurchase'
-                  :input="input"
-                  :isEdit="isEditInput"
-                  :isDesignation="isDesignation"
+                  v-bind="{selected, isPurchase, inputToEdit, isDesignation, selectedId}"
                   @select="selectProduct"
                   @add="addInput"
-                  @edit="updateInput"
+                  @edit="editInput"
                   @delete="deleteInput"
                   @reset="resetInput">
                 </InvoiceItem>
               </div>
               <div class="columns tags">
                 <div class="column is-11">
-                  <b-taglist v-if="trends">
-                    <b-tag
-                    v-for="(trend, idx) in trends"
-                    type="is-dark"
-                    :key="idx"
-                    @click="input.ProductId = trend.dataValues.id">{{trend.dataValues.name}}
-                    </b-tag>
-                  </b-taglist>
-                  <div v-else>
-                    
-                  </div>
+                  <Tags
+                    v-if="false"
+                    :tags="trends"
+                    @click="selectedId = $event"/>
                 </div>
                 <div class="colum is-1">
                   <b-field label="TOTAL"  type="is-primary">
@@ -241,27 +230,12 @@
           </section>
 
           <footer :class="{'modal-card-foot': isModal}">
-            <template v-if="isModal && isUpdate" >
+            <template v-if="isUpdate">
               <button class="button" type="button" @click="$parent.close();">Fermer</button>
-              <button @click="newCopy"
-                type="is-light">
-                  <b-icon icon="copy"></b-icon>
-                  Créer une copie 
-              </button>
-              <button
-                  type="is-dark"
-                  @click="print">
-                Imprimer
-              </button>
-              <button
-                  type="is-danger"
-                  icon-left="delete"
-                  @click="deleteInvoice">
-                Supprimer
-              </button>
-              <button type="submit" class="button is-primary">
-                Modifier
-              </button>
+              <button class="button is-dark" @click="newCopy">Créer une copie</button>
+              <button class="button is-primary" @click="preview">Apercu</button>
+              <button class="button is-danger" icon-left="delete" @click="deleteInvoice">Supprimer</button>
+              <button class="submit is-success">Modifier</button>
               <b-dropdown aria-role="list" v-if="transferList" @change="transferTo">
                   <button class="button is-dark" slot="trigger">
                       <span>Transferer vers</span>
@@ -272,17 +246,9 @@
               </b-dropdown>
             </template>
             <template v-else>
-              <b-button
-                type="is-warning"
-                @click="resetInvoice">
-              Reset
-              </b-button>
-              <button v-if="realModelName == 'CounterSale'" @click="submitDraft" class="button is-link" >
-                Brouillon
-              </button>
-              <button type="submit" class="button is-success" >
-                Enregistrer
-              </button>
+              <button class="button is-warning" @click="resetInvoice">Reset</button>
+              <button v-if="realModelName == 'CounterSale'" class="button is-link" @click="submitDraft">Brouillon</button>
+              <button type="submit" class="button is-success">Enregistrer</button>
             </template>
           </footer>
         </div>
@@ -303,12 +269,13 @@
 import {ipcRenderer} from 'electron';
 import InvoiceItem from '@/components/InvoiceItem.vue'
 import AccountModalForm from '@/components/AccountModalForm';
+import Tags from '@/components/Tags';
 import numberToText from '@/assets/js/numberToText';
 import { EventBus } from '@/utils/event-bus.js';
 
 class Invoice {
   constructor(invoice) {
-    // this.id = invoice ? invoice.id : null;
+    this.id = invoice ? invoice.id : null;
     this.number = invoice ? invoice.number : '';
     this.tva_percentage = invoice ? invoice.tva_percentage : 0;
     this.payment_method = invoice ? invoice.payment_method : '';
@@ -320,30 +287,11 @@ class Invoice {
     this.ClientId = invoice ? invoice.ClientId : null;
     this.SupplierId = invoice ? invoice.SupplierId : null;
     this.date = invoice ? new Date(invoice.date) : new Date();
-    // this.date = invoice ? invoice.date : '';
     this.debt_last_date = invoice ? invoice.debt_last_date : '';
     this.debt_alarm_weeks = invoice ? invoice.debt_alarm_weeks : 0;
     this.debt_alarm_date = invoice ? new Date(invoice.debt_alarm_date) : new Date();
     this.debt_rest = invoice ? invoice.debt_rest : null;
     this.debt_note = invoice ? invoice.debt_note : '';
-  }
-}
-
-class Input {
-  constructor(item) {
-    this.orderNumber = Input.incrementId()
-    this.ProductId = item ? item.ProductId : '',
-    this.unity_price = item ? item.unity_price : null,
-    this.unity = item ? item.unity : 'U',
-    this.quantity = item ? item.quantity : 1,
-    this.amount = item ? item.amount : 0,
-    this.productData = {};
-  }
-
-  static incrementId() {
-    if (!this.latestId) this.latestId = 1;
-    else this.latestId++;
-    return this.latestId;
   }
 }
 
@@ -359,7 +307,8 @@ export default {
   name: 'CreateInvoice',
   components: {
     InvoiceItem,
-    AccountModalForm
+    AccountModalForm,
+    Tags
   },
   props: {
     modelName: {
@@ -395,12 +344,11 @@ export default {
       forcedModelName: null,
       invoice: {
         invoiceData: new Invoice(),
-        payments: [],
+        payments: [new Payment()],
         inputs: [],
         isPrinted: false,
       },
-      input: new Input(),
-      rowIndex: null,
+      inputToEdit: null,
       isLoading: false,
       previewImagePath: '',
       forcedUpdate: null,
@@ -408,6 +356,7 @@ export default {
       isPDFViewerModalActive: false,
       pdfFile: null,
       withoutSupplier: false,
+      selectedId: null,
       inputColumns: [
         {
             field: 'ProductId',
@@ -461,9 +410,6 @@ export default {
           bool = false;
       }
       return bool;
-    },
-    isEditInput() {
-      return (this.rowIndex == null || this.rowIndex < 0 ) ? false : true;
     },
     transferList() {
       if (this.modelName == 'Proformat' || this.modelName == 'SaleOrder')
@@ -550,16 +496,6 @@ export default {
       },
       deep: true
     },
-    // 'invoice.long_date': {
-    //   immediate: true,
-    //   handler: function(d) {
-    //     this.invoice.date = [
-    //       ('0' + d.getDate()).slice(-2),
-    //       ('0' + (d.getMonth() + 1)).slice(-2),
-    //       d.getFullYear()
-    //     ].join('-');
-    //   },
-    // },
     'invoice.invoiceData.remise_amount': {
       handler: function(after, before) {
         this.invoice.invoiceData.remise_percentage = Number(after) * 100 / this.ttcPlusTimbres;
@@ -627,63 +563,49 @@ export default {
       })
     },
     
-    addInput() {
-      this.invoice.inputs.push(this.input)
-      
-      this.input = new Input();
+    addInput(input) {
+      this.invoice.inputs.push(input);
     },
     setInvoiceItem(row) {
-      this.input = {...row};
-      this.rowIndex = this.invoice.inputs.findIndex(r => r._id == row._id);
+      this.inputToEdit = {...row};
     },
-    updateInput() {
-      this.invoice.inputs.splice(this.rowIndex, 1);
-      this.invoice.inputs.splice(this.rowIndex, 0, this.input);
-      this.input = new Input();
-      this.rowIndex = null;
+    editInput(newInput) {
+      let inputIndex = this.invoice.inputs.findIndex(input => input.id == newInput.id);
+      this.invoice.inputs[inputIndex] = newInput;
+      this.inputToEdit = null;
     },
     deleteInput() {
-      this.invoice.inputs.splice(this.rowIndex, 1);
-      this.input = new Input();
-      this.rowIndex = null;
+      this.invoice.inputs.splice(this.index, 1);
     },
     resetInput() {
-      this.input = this.invoice.inputs[this.rowIndex];
+      this.input = this.invoice.inputs[this.inputIndex];
     },
-    openPDFViewer(pdfFile) {
-      this.$dispatch('open-pdf-viewer', pdfFile);
-    },
-    print() {
-      ipcRenderer.send('create-pdf', {data: [this.invoice.invoiceData], doc: this.realModelName})
+    preview() {
+      this.$store.commit('SET_PREVIEW_DATA', {data: this.invoice, templateName: this.realModelName})
     }
   },
   mounted() {
     if (this.data) {
-      this.invoice = new Invoice(this.data, this.itCounts)
-
-      this.data.Items.forEach((item) => {
-        this.invoice.inputs.push(new Input(item.dataValues));
-      })
+      this.invoice.invoiceData = new Invoice(this.data)
+      this.invoice.inputs = this.data.items.dataValues;
 
       this.data.Payments.forEach((payment) => {
         this.invoice.payments.push(new Payment(payment.dataValues));
       })
 
       if (this.isDebt)
-        this.invoice.payments.push(new Payment({number: this.invoice.payments.length}));
-
-    } else {
-      this.invoice.payments.push(new Payment());
+        // this.invoice.payments.push(new Payment({number: this.invoice.payments.length}));
+        this.invoice.payments.push(new Payment());
     }
-
 
     ipcRenderer.on('invoice_created', (event, r) => {
       this.isLoading = false;
-      console.log('invoice_created', r.pdfFile)
+      
       if (r.status) {
         this.successToast(r.message)
-        // this.resetInvoice();
-        this.openPDFViewer(r.pdfFile);
+        this.resetInvoice();
+        if (this.invoice.isPrinted)
+          this.$store.commit('SET_PREVIEW_DATA', {data: r.invoice, templateName: this.realModelName})
       } else {
         this.failToast(r.message)
       }
@@ -709,13 +631,6 @@ export default {
       // close modal
       this.$parent.close();
     })
-
-    ipcRenderer.on('pdf-created', (event, r) => {
-      if (r.status)
-        EventBus.$emit('open-pdf-viewer', r.pdfFile);
-      else
-        this.failToast(r.message)
-    });
   }
 };
 </script>

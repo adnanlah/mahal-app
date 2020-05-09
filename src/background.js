@@ -16,13 +16,14 @@ let {sequelize, Sequelize} = dbs;
 const Op = Sequelize.Op;
 
 const dataDir = path.join(app.getPath('exe'), `../data`);
-const documentsDir = app.getPath('documents');
+const documentsDir = path.join(app.getPath('documents'), `/Mahal-Documents`);
 
-if (!fs.existsSync(dataDir)){
-    fs.mkdirSync(path.join(dataDir, '/documents'), { recursive: true });
-    fs.mkdirSync(path.join(dataDir, '/productsimages'), { recursive: true });
+if (!fs.existsSync(documentsDir)){
+    fs.mkdirSync(documentsDir, { recursive: true });
+    // fs.mkdirSync(path.join(dataDir, '/documents'), { recursive: true });
+    // fs.mkdirSync(path.join(dataDir, '/productsimages'), { recursive: true });
 }
-let dg = new DocumentGenerator(dataDir, documentsDir);
+let dg = new DocumentGenerator(documentsDir);
 
 const umzug = new Umzug({
   migrations: {
@@ -196,32 +197,33 @@ ipcMain.on('create_invoice', function (event, data) {
       })
       return Promise.all([invoice.setItems(products, { through: {}, individualHooks: true, transaction}), invoice]);
     })
-    .then(() => {
-      return dbs.Log.create({
-        message: 'Facture a été bien crée.'
-      })
-    })
+    
   })
   .then((results) => {
+    let includeArray = [
+      {model: dbs.Product, as: 'Items', through: {}, raw: true},      
+    ]
+    if (modelName != 'CounterSale')
+      includeArray.push({model: dbs.Account, as: isPurchase ? 'Supplier' : 'Client', raw: true});
     if (invoice.isPrinted) {
       return dbs[modelName].findByPk(results[1].dataValues.id, {
-        include: [{model: dbs.Product, as: 'Items'}]
+        include: includeArray
       })
     } else {
       return null;
     }
   })
   .then((invoice) => {
-    console.log('---inv', invoice)
+    console.log('---invoice createdinvoice.Items[0].CounterSale_Product.dataValues', invoice.Items[0])
     if (invoice)
-      return dg.pdf([invoice], modelName);
+      return event.sender.send('invoice_created', {status: true, message: `Facture bien ajouté!`, invoice});
     else
       return null;
   })
-  .then((pdfFile) => {
-    console.log('pdf' ,pdfFile)
-    console.log('typeof pdf' ,typeof pdfFile)
-    return event.sender.send('invoice_created', {status: true, message: `Facture bien ajouté!`, pdfFile});
+  .then(() => {
+    return dbs.Log.create({
+      message: 'Facture a été bien crée.'
+    })
   })
   .catch(function (e) {
     console.log('Transaction has been rolled back: ', e)
@@ -716,10 +718,41 @@ ipcMain.on('set_password', function (event, passData) {
   *** Print ***
 */
 
-ipcMain.on('create-pdf', function (event, data) {
-  dg.pdf(data.data, data.doc)
-  .then((pdfFile) => {
-    event.sender.send('pdf-created', {status: true, pdfFile))
-  })
-  .catch(e => event.sender.send('pdf-created', {status: false, messaage: `Error imprimer ${e.message}`}))
+// ipcMain.on('create-pdf', function (event, data) {
+//   dg.pdf(data.data, data.doc)
+//   .then((pdfFile) => {
+//     return event.sender.send('pdf-created', {status: true, pdfFile})
+//   })
+//   .catch(e => event.sender.send('pdf-created', {status: false, message: `Error imprimer ${e.message}`}))
+// });
+
+ipcMain.on('print-win', function (event, data) {
+  win.webContents.print({
+    silent: false,
+    margins: {
+      marginType: 'custom',
+      top: 0,
+      left: 0,
+      bottom: 0,
+      right: 0,
+    },
+    scaleFactor: 2
+  }, (success, errorType) => {
+    console.log('--success error', success, errorType)
+  });
+});
+
+ipcMain.on('save-pdf', function (event, data) {
+  let pdfPath = path.join(documentsDir, `/test${Math.random()}.pdf`);
+  win.webContents.printToPDF({
+    marginType: 1,
+    pageSize: 'A4',
+  }, (error, data) => {
+    if (error) console.log('saving pdf error', error);
+    fs.writeFile(pdfPath, data, (error) => {
+      if (error) throw error
+      // shell.openExternal('file://' + pdfPath)
+      console.log('Write PDF successfully.')
+    })
+  });
 });

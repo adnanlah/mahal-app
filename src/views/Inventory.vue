@@ -185,9 +185,6 @@
 				//     })
 				// })
 			},
-			onInput(event) {
-					this.filterCode = event.target._vCleave.getFormattedValue()
-			},
 			toggle(row) {
 					this.$refs.table.toggleDetails(row)
 			},
@@ -201,8 +198,8 @@
 			printInventory() {
 				ipcRenderer.send('create-pdf', {data: this.productCategories, doc: 'Inventory'})
 			},
-			printInventory() {
-				console.log('create-pdf ', {data: this.productCategories, doc: 'Tickets'})
+			printTickets() {
+				ipcRenderer.send('create-pdf', {data: this.productCategories, doc: 'Tickets'})
 			}
 		},
 		mounted() {

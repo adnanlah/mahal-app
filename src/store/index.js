@@ -3,6 +3,8 @@ import Vuex from 'vuex'
 import accounts from './modules/accounts';
 import trends from './modules/trends';
 import categories from './modules/categories';
+import company from './modules/company';
+import modals from './modules/modals';
 // const dbs = require('../models');
 
 Vue.use(Vuex)
@@ -17,6 +19,7 @@ export default new Vuex.Store({
 	actions: {
 		GET_INIT: ({dispatch}) => {
 			return Promise.all([
+				dispatch('GET_COMPANY'),
 				dispatch('GET_CATEGORY'),
 				dispatch('GET_ACCOUNT'),
 				dispatch('GET_TREND'),
@@ -29,5 +32,7 @@ export default new Vuex.Store({
 		// jobfunctions,
 		trends,
 		categories,
+		company,
+		modals,
 	}
 })

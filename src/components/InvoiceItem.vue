@@ -60,7 +60,7 @@
 	            <b-input style="width: 120px;" controls-position="compact" type="is-light" v-model.number="input.amount" disabled></b-input>
 	         </b-field>
 
-          <b-field v-if="isEdit" label=" ‎">
+          <b-field v-if="inputToEdit" label=" ‎">
           	<button type="submit" class="button is-link" > <b-icon icon="pencil"></b-icon> </button>
           </b-field>
 
@@ -68,8 +68,8 @@
             <button type="submit" class="button is-success" > <b-icon icon="plus"></b-icon> </button>
           </b-field>
 
-          <b-field v-if="isEdit" label=" ‎">
-            <b-button type="is-danger"  @click="$emit('delete')">
+          <b-field v-if="inputToEdit" label=" ‎">
+            <b-button type="is-danger"  @click="onDelete">
 				<b-icon icon="delete"></b-icon>
             	</b-button>
           </b-field>
@@ -95,112 +95,141 @@
 </template>
 
 <script>
-	import ProductModalForm from '@/components/ProductModalForm';
+
+class Input {
+  constructor(item) {
+    this.id = item ? item.id : 'fakeid' + Input.incrementId(),
+    this.ProductId = item ? item.ProductId : '',
+    this.unity_price = item ? item.unity_price : null,
+    this.unity = item ? item.unity : 'U',
+    this.quantity = item ? item.quantity : 1,
+    this.amount = item ? item.amount : 0,
+    this.productData = {};
+  }
+
+  static incrementId() {
+    if (!this.latestId) this.latestId = 1;
+    else this.latestId++;
+    return this.latestId;
+  }
+}
+
+import ProductModalForm from '@/components/ProductModalForm';
 import {ipcRenderer} from 'electron';
 
-	export default {
-		name: 'InvoiceItem',
-		components: {
-			ProductModalForm
-		},
-		data(){
-			return {
-				isLoading: true,
-				isProductModalActive: false,
-				productData: null,
-				productCategories: null,
-			}
-		},
-		props: {
-			isPurchase: {
-				type: Boolean,
-				required: true
-			},
-			input: {
-				required: true
-			},
-			isEdit: {
-				required: false,
-				default: false
-			},
-			isDesignation: {
-				type: Boolean,
-				default: false
-			},
-			selected: {
-				required: true
-			}
-		},
-		methods: {
-			onSubmit() {
-				if (this.isEdit)
-					this.$emit('edit')
-				else
-					this.$emit('add')
-			},
-			setProductData() {
-				this.productCategories.some((pc) => {
-					return pc.Products.some((p) => {
-						if (p.dataValues.id == this.input.ProductId)
-							return this.productData = p.dataValues;
-					})
-				})
-			},
-			getAllProducts() {
-				this.isLoading = true;
-				ipcRenderer.send('get_all_products');
-
-			    ipcRenderer.on('all_products', (event, products) => {
-					this.isLoading = false;
-			      this.productCategories = products;
-			    })
-			},
-			productSelected() {
-				this.setProductData();
-				if (!this.isPurchase) {
-					this.input.unity_price = this.productData.selling_price;
-				}
-				this.input.designation = this.productData.name;
-				this.$emit('select', this.productData.image_path)
-			}
-		},
-		computed: {
-			
-		},
-		watch: {
-			'input.ProductId': {
-				handler: function(newID, before) {
-					
-				},
-				deep: true
-			},
-			'input.quantity': {
-				handler: function(after, before) {
-					this.input.amount = Number(this.input.unity_price) * Number(after);
-				},
-				deep: true
-			},
-			'input.unity_price': {
-				handler: function(after, before) {
-					this.input.amount = Number(after) * Number(this.input.quantity);
-				},
-				deep: true
-			},
-			'productCategories': {
-				immediate: true,
-				handler: function(after, before) {
-					if (after) {
-						this.isLoading = false;
-						if (this.input.ProductId)
-							this.setProductData()
-					}
-				}
-			}
-		},
-		mounted() {
-		    this.getAllProducts();
+export default {
+	name: 'InvoiceItem',
+	components: {
+		ProductModalForm
+	},
+	data(){
+		return {
+			input: new Input(),
+			isLoading: true,
+			isProductModalActive: false,
+			productData: null,
+			productCategories: null,
 		}
-	};
+	},
+	props: {
+		isPurchase: {
+			type: Boolean,
+			required: true
+		},
+		inputToEdit: {
+			type: Object,
+			required: false,
+			default: null
+		},
+		isDesignation: {
+			type: Boolean,
+			default: false
+		},
+		selected: {
+			type: Array,
+			required: true
+		},
+		selectedId: {
+			type: Number,
+			required: false,
+			default: null,
+		}
+	},
+	methods: {
+		onSubmit() {
+			if (this.inputToEdit)
+				this.$emit('edit', this.input)
+			else
+				this.$emit('add', this.input)
+			this.input = new Input();
+		},
+		onDelete() {
+			this.$emit('delete', this.input)
+			this.input = new Input();
+		},
+		setProductData() {
+			this.productCategories.some((pc) => {
+				return pc.Products.some((p) => {
+					if (p.dataValues.id == this.input.ProductId)
+						return this.productData = p.dataValues;
+				})
+			})
+		},
+		getAllProducts() {
+			this.isLoading = true;
+			ipcRenderer.send('get_all_products');
+
+		    ipcRenderer.on('all_products', (event, products) => {
+				this.isLoading = false;
+		      this.productCategories = products;
+		    })
+		},
+		productSelected() {
+			this.setProductData();
+			if (!this.isPurchase) {
+				this.input.unity_price = this.productData.selling_price;
+			}
+			this.input.designation = this.productData.name;
+			this.$emit('select', this.productData.image_path)
+		}
+	},
+	computed: {
+		
+	},
+	watch: {
+		'selectedId': {
+			immediate: true,
+			handler: function(newId) {
+				this.input.ProductId = newId;
+			},
+		},
+		'input.quantity': {
+			handler: function(after, before) {
+				this.input.amount = Number(this.input.unity_price) * Number(after);
+			},
+			deep: true
+		},
+		'input.unity_price': {
+			handler: function(after, before) {
+				this.input.amount = Number(after) * Number(this.input.quantity);
+			},
+			deep: true
+		},
+		'productCategories': {
+			immediate: true,
+			handler: function(after, before) {
+				if (after) {
+					this.isLoading = false;
+					if (this.input.ProductId)
+						this.setProductData()
+				}
+			}
+		}
+	},
+	mounted() {
+	    this.getAllProducts();
+	}
+};
 	
 </script>
 

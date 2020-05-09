@@ -1,6 +1,7 @@
 <template>
   <div id="app">
-    <div id="nav">
+    <nav id="nav">
+
       <b-navbar>
         <template slot="brand">
             <b-navbar-item tag="router-link" :to="{ path: '/' }">
@@ -8,9 +9,6 @@
             </b-navbar-item>
         </template>
         <template slot="start">
-            <!-- <b-navbar-item tag="router-link" :to="{ path: '/' }">
-                Acceuil
-            </b-navbar-item> -->
             <b-navbar-item tag="router-link" :to="{ path: '/' }">
                 VENTE COMPTOIR
             </b-navbar-item>
@@ -64,7 +62,7 @@
 
         </template>
 
-      <template slot="end">
+        <template slot="end">
           <b-dropdown aria-role="list">
               <a
                   class="navbar-item"
@@ -89,12 +87,12 @@
                 LOGOUT
               </b-dropdown-item>
           </b-dropdown>
-      </template>
-    </b-navbar>
+        </template>
+      </b-navbar>
 
     
 
-    </div>
+    </nav>
     <main class="main">
       <div class="main-content">
         <router-view></router-view>
@@ -126,17 +124,25 @@
                  aria-modal>
             <About></About>
         </b-modal>
-        <b-modal :active.sync="isPDFViewerModalActive"
-          has-modal-card
-          @close="closedPDFViewer"
-          full-screen
-          trap-focus
-          aria-role="dialog"
-          aria-modal>
-          <PDFViewer v-bind="{pdfFile}"></PDFViewer>
-        </b-modal>
       </div>
     </main>
+    <!-- <div v-if="isPreviewModalActive" class="tst" id="print-area">
+      <div class="print">
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nobis, ipsam. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nihil animi dolores cumque, ipsam odio culpa quia expedita accusantium tempora distinctio neque iste optio nesciunt, dolorum numquam autem vero perferendis asperiores possimus praesentium! Possimus quibusdam rerum ratione voluptates amet eos, voluptatem nam placeat voluptatum animi blanditiis id a, aperiam eaque corrupti!
+      </div>
+    </div>
+    <button @click="savePDF">Sauv</button> -->
+
+    <b-modal :active.sync="isPreviewModalActive"
+      has-modal-card
+      @close="closedDocPreview"
+      full-screen
+      trap-focus
+      id="previewModal"
+      aria-role="dialog"
+      aria-modal> -->
+      <DocPreview v-if="isPreviewModalActive" :data="previewData.data" :templateName="previewData.templateName" :company="companyData"></DocPreview>
+    </b-modal>
   </div>
 </template>
 
@@ -145,15 +151,8 @@ import {ipcRenderer} from 'electron';
 import CompanyForm from '@/components/CompanyForm';
 import PasswordForm from '@/components/PasswordForm';
 import ConfigForm from '@/components/ConfigForm';
-import PDFViewer from '@/components/PDFViewer/PDFViewer';
+import DocPreview from '@/components/Templates/DocPreview';
 import About from '@/components/About';
-
-import { EventBus } from '@/utils/event-bus.js';
-
-EventBus.$on('open-pdf-file', pdfFile => {
-  this.pdfFile = pdfFile;
-  this.isPDFViewerModalActive = true;
-});
 
 ipcRenderer.on('overdue_invoices', (event, overdueInvoicesResult) => {
   if (overdueInvoicesResult.count > 0)
@@ -167,6 +166,7 @@ export default {
     ConfigForm,
     CompanyForm,
     PasswordForm,
+    DocPreview,
     About
   },
 
@@ -176,15 +176,34 @@ export default {
     isCompanyModalActive: false,
     isPasswordModalActive: false,
     isAboutModalActive: false,
-    isPDFViewerModalActive: false,
-    pdfFile: null,
+    isPreviewModalActive: false,
   }),
 
-  methods: {
-    closedPDFViewer() {
-      this.isPDFViewerModalActive = false;
-      this.pdfFile = null;
+  computed: {
+    previewData() {
+      return this.$store.getters.PMD;
     },
+    companyData() {
+      return this.$store.getters.COMPANY_DATA;
+    },
+  },
+
+  methods: {
+    closedDocPreview() {
+      this.$store.commit('DELETE_PREVIEW_DATA')
+    },
+     savePDF() {
+      ipcRenderer.send('save-pdf')
+    }
+  },
+
+  watch: {
+    previewData(val) {
+      if (val)
+        this.isPreviewModalActive = true;
+      else
+        this.isPreviewModalActive = false;
+    }
   },
 
   mounted() {
@@ -199,18 +218,21 @@ export default {
 </script>
 
 <style lang="scss">
-@media print
-{    
-  * {
-    display: none !important;
+
+@media print {
+  #app > * {
+    display: none;
   }
-  canvas {
-    display: inline;
-    border: 1px solid black;
-    page-break-after: always;
+  #previewModal, #previewModal {
+    display: block;
+  }
+  #app {
+    width: 100% !important;
+  }
+  #previewModal {
+    padding: 0; margin: 0;
   }
 }
-
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -218,6 +240,7 @@ export default {
   text-align: center;
   color: #2c3e50;
   background-color: #222;
+  width: 100vw;
 }
 
 #nav {
@@ -233,10 +256,11 @@ export default {
 }
 
 .main {
-  width: 85%;
-  height: 100vh;
+  width: 100%;
+  /*height: 100vh;*/
   margin: 0 auto;
   background-color: #efeeef;
+  border: 1px solid yellow;
 }
 .main-content {
 }

@@ -17,8 +17,8 @@ module.exports = {
         nis: '456987123',
         cap: '789654789',
         bank_account: '456321789',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toString(),
+        updatedAt: new Date().toString(),
       }, {
         type: 'client',
         name: 'Adnan',
@@ -34,8 +34,8 @@ module.exports = {
         nis: '456987123',
         cap: '789654789',
         bank_account: '456321789',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toString(),
+        updatedAt: new Date().toString(),
       }], {});
   },
 

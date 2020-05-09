@@ -78,8 +78,6 @@
                 :modelName="searchData.modelName"
             ></CreateInvoice>
         </b-modal>
-
-		<!-- <InvoicePreviewModal /> -->
 	</div>
 </template>
 
@@ -202,7 +200,7 @@
 
     
     ipcRenderer.on('all_invoices', (event, invoices) => {
-      this.invoices = invoices;
+      this.invoices = Object.freeze(invoices);
     });
 
     
