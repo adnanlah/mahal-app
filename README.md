@@ -1,4 +1,6 @@
-# ve
+# Mahal App
+
+An inventory management system made with Vue and Electron. 90% done.
 
 ## Project setup
 ```
